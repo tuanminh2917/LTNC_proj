@@ -1,0 +1,118 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 30px;
+}
+
+/* Container chính cho mỗi khung */
+.container {
+    background-color: white;
+    border: 2px solid #333;
+    width: 800px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Tiêu đề góc trái (Tìm kiếm / Cập nhật) */
+.section-title {
+    color: #d9534f;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Khu vực nhập liệu bên phải */
+.input-group-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.input-row label {
+    color: #0056b3;
+    font-weight: bold;
+    margin-right: 15px;
+    width: 120px;
+    text-align: left;
+}
+
+.input-row input {
+    border: 1px solid #0056b3;
+    width: 180px;
+    padding: 4px;
+    outline: none;
+}
+
+/* Bảng hiển thị */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table, th, td {
+    border: 1px solid #0056b3;
+}
+
+th {
+    color: #0056b3;
+    padding: 10px;
+    text-align: left;
+    background-color: #f9f9f9;
+}
+
+td {
+    padding: 10px;
+    height: 30px;
+}
+
+/* Nút bấm */
+.btn {
+    border: 1px solid #f0ad4e;
+    background: white;
+    color: #f0ad4e;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.btn-update-list {
+    margin-bottom: 15px;
+}
+
+.btn-delete-row {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+}
+
+.footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+/* Căn chỉnh riêng cho cột xóa ở bảng dưới */
+.delete-cell {
+    border: none;
+    vertical-align: middle;
+    padding-left: 10px;
+}

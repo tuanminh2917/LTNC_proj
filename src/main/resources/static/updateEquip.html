@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao diện Quản lý Thiết bị</title>
+    <link rel="stylesheet" href="/css/updateEquip.css">
+</head>
+<body>
+
+    <div class="container" id="search-section">
+        <div class="section-title">Tìm kiếm</div>
+        
+        <div class="input-group-container">
+            <div class="input-row">
+                <label>Mã thiết bị</label>
+                <input type="text">
+            </div>
+            <div class="input-row">
+                <label>Tên</label>
+                <input type="text">
+            </div>
+            <div class="input-row">
+                <label>Nước sản xuất</label>
+                <input type="text">
+            </div>
+            <div class="input-row">
+                <label>Ngày tiếp nhận</label>
+                <!--date input-->
+                <input type="date">
+            </div>
+            <div class="input-row">
+                <label>Mã đơn vị</label>
+                <input type="text">
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Mã thiết bị</th>
+                    <th style="width: 35%;">Tên</th>
+                    <th style="width: 25%;">Nước sản xuất</th>
+                    <th style="width: 25%;">Ngày tiếp nhận</th>
+                    <th style="width: 10%;">Mã đơn vị</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer-actions">
+            <button class="btn" id="searchBtn">Tìm kiếm</button>
+        </div>
+    </div>
+
+    <div class="container" id="update-section">
+        <div class="section-title">Cập nhật</div>
+        
+        <div class="input-group-container">
+            <div class="input-row">
+                <label>Mã thiết bị</label>
+                <input type="text">
+            </div>
+            <div class="input-row">
+                <label>Tên</label>
+                <input type="text">
+            </div>
+            <div class="input-row">
+                <label>Nước sản xuất</label>
+                <input type="text">
+            </div>
+            <div class="input-row">
+                <label>Ngày tiếp nhận</label>
+                <!--date input-->
+                <input type="date">
+            </div>
+            <div class="input-row">
+                <label>Mã đơn vị</label>
+                <input type="text">
+            </div>
+            <button class="btn btn-update-list">Thêm vào danh sách cập nhật</button>
+        </div>
+
+        <div style="display: flex; align-items: center;">
+            <table style="flex-grow: 1;">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Mã thiết bị</th>
+                        <th style="width: 35%;">Tên</th>
+                        <th style="width: 25%;">Nước sản xuất</th>
+                        <th style="width: 25%;">Ngày tiếp nhận</th>
+                        <th style="width: 10%;">Mã đơn vị</th>
+                        <th style="width: 10%;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ABC 123</td>
+                        <td>Máy...</td>
+                        <td>Đức</td>
+                        <td>21-02-2023</td>
+                        <td>UNIT001</td>
+                        <td>
+                            <button class="btn btn-delete-row">Xoá</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <button class="btn btn-delete-row">Xoá</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn" id="updateBtn">Cập nhật</button>
+        </div>
+    </div>
+
+</body>
+    <script src="/js/updateEquip.js"></script>
+</html>
