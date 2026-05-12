@@ -45,4 +45,20 @@ public class EquipmentController {
         // Tra ve 200 OK kem theo thong tin thiet bi duoi dang JSON
         return ResponseEntity.ok(equipmentOpt.get());
     }
-}
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addEquipment(@RequestBody Equipment equipment) {
+        try {
+            Equipment savedEquipment = equipmentService.addEquipment(equipment);
+            return ResponseEntity.ok(savedEquipment);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Equipment>> getAllEquipment() {
+        return ResponseEntity.ok(equipmentService.getAllEquipment());
+    }
+    }
+

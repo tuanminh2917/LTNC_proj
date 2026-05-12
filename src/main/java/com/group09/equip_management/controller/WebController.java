@@ -13,4 +13,9 @@ public class WebController {
         // Spring Boot se tu dong tim file static/updateEquip.html
         return "/updateEquip.html";
     }
+
+    @GetMapping("/EquipmentList/Add")
+    public String getAddPage() {
+        return "/addEquip.html";
+    }
 }

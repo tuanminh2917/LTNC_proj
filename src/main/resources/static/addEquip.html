@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm thiết bị</title>
+    <link rel="stylesheet" href="/css/addEquip.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+    <h1>Quản lý danh mục trang thiết bị</h1>
+
+    <div class="main-layout">
+        <section class="card form-card">
+            <h2>Thêm thiết bị</h2>
+
+            <div class="input-row">
+                <label for="equipId">Mã thiết bị</label>
+                <input type="text" id="equipId">
+            </div>
+
+            <div class="input-row">
+                <label for="equipName">Tên</label>
+                <input type="text" id="equipName">
+            </div>
+
+            <div class="input-row">
+                <label for="origin">Nước sản xuất</label>
+                <input type="text" id="origin">
+            </div>
+
+            <div class="input-row">
+                <label for="dateOfReceipt">Ngày tiếp nhận</label>
+                <input type="date" id="dateOfReceipt">
+            </div>
+
+            <div class="input-row">
+                <label for="userId">Mã đơn vị</label>
+                <input type="number" id="userId">
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="addBtn">Thêm thiết bị</button>
+                <button class="btn btn-secondary" id="resetBtn">Làm mới</button>
+            </div>
+
+            <p class="note">
+                Sau khi thêm thành công, danh sách thiết bị bên phải sẽ tự động cập nhật.
+            </p>
+        </section>
+
+        <section class="card table-card">
+            <div class="table-header">
+                <h2>Danh sách thiết bị hiện tại</h2>
+                <button class="btn btn-secondary" id="reloadBtn">Tải lại</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã thiết bị</th>
+                        <th>Tên thiết bị</th>
+                        <th>Nước sản xuất</th>
+                        <th>Ngày tiếp nhận</th>
+                        <th>Mã đơn vị</th>
+                    </tr>
+                </thead>
+                <tbody id="equipmentTableBody">
+                    <tr>
+                        <td colspan="5" class="empty-row">Đang tải dữ liệu...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+<script src="/js/addEquip.js"></script>
+</body>
+</html>

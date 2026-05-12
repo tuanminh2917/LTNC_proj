@@ -1,0 +1,156 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
+
+.page-wrapper {
+    width: 1200px;
+    max-width: 95%;
+    margin: 30px auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #222;
+}
+
+.main-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.card {
+    background-color: #ffffff;
+    border: 2px solid #333;
+    padding: 22px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.form-card h2,
+.table-card h2 {
+    color: #d9534f;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.input-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+}
+
+.input-row label {
+    color: #0056b3;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.input-row input {
+    border: 1px solid #0056b3;
+    padding: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.input-row input:focus {
+    border-color: #f0ad4e;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.btn {
+    border: 1px solid #f0ad4e;
+    background: white;
+    color: #f0ad4e;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.btn-primary {
+    border-color: #f0ad4e;
+    color: #f0ad4e;
+}
+
+.btn-secondary {
+    border-color: #777;
+    color: #777;
+}
+
+.btn-secondary:hover {
+    background-color: #777;
+    color: white;
+}
+
+.note {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: white;
+}
+
+th,
+td {
+    border: 1px solid #bdbdbd;
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background-color: #e9ecef;
+    color: #003f88;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.empty-row {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+}
+
+.error-text {
+    color: #d9534f;
+}
+
+@media (max-width: 900px) {
+    .main-layout {
+        grid-template-columns: 1fr;
+    }
+}
