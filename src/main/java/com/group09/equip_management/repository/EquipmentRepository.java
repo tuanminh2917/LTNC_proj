@@ -13,13 +13,15 @@ public interface EquipmentRepository extends JpaRepository<Equipment, String> {
 
     // Dung nativeQuery = true de viet SQL thuan tuy dung voi ten cot trong Database cua ban
     @Query(value = "SELECT * FROM Equipment WHERE " +
-           "(:id IS NULL OR :id = '' OR equip_id LIKE CONCAT('%', :id, '%')) AND " +
-           "(:name IS NULL OR :name = '' OR equip_name LIKE CONCAT('%', :name, '%')) AND " +
-           "(:origin IS NULL OR :origin = '' OR origin LIKE CONCAT('%', :origin, '%')) AND " +
-           "(:rDate IS NULL OR date_of_receipt = :rDate)", 
-           nativeQuery = true)
-    List<Equipment> searchEquipment(@Param("id") String id, 
-                                    @Param("name") String name, 
-                                    @Param("origin") String origin, 
-                                    @Param("rDate") LocalDate rDate);
+       "(:id IS NULL OR :id = '' OR equip_id LIKE CONCAT('%', :id, '%')) AND " +
+       "(:name IS NULL OR :name = '' OR equip_name LIKE CONCAT('%', :name, '%')) AND " +
+       "(:origin IS NULL OR :origin = '' OR origin LIKE CONCAT('%', :origin, '%')) AND " +
+       "(:rDate IS NULL OR date_of_receipt = :rDate) AND " +
+       "(:uID IS NULL OR user_id = :uID)", // Chỉ kiểm tra NULL cho Integer
+       nativeQuery = true)
+       List<Equipment> searchEquipment(@Param("id") String id, 
+                                   @Param("name") String name, 
+                                   @Param("origin") String origin, 
+                                   @Param("rDate") LocalDate rDate,
+                                   @Param("uID") Integer uID); // Chuyển về Integer
 }

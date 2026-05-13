@@ -28,14 +28,21 @@ document.getElementById('updateBtn').addEventListener('click', function() {
 });
 
 function handleSearch() {
-    // Lay gia tri tu cac o input va xoa khoang trang thua
-    const idValue = document.querySelector('#search-section .input-row:nth-child(1) input').value.trim();
-    const nameValue = document.querySelector('#search-section .input-row:nth-child(2) input').value.trim();
-    const countryValue = document.querySelector('#search-section .input-row:nth-child(3) input').value.trim();
-    let dateValue = document.querySelector('#search-section .input-row:nth-child(4) input').value;
-    const unitIdValue = document.querySelector('#search-section .input-row:nth-child(5) input').value.trim();
+    // 1. Lấy giá trị từ các ô input thông qua Selector chính xác hơn
+    // Sử dụng ID của container cha (giả sử là #search-section) để tránh lấy nhầm input ở phần khác
+    const container = document.querySelector('#search-section .input-group-container');
+    
+    const idValue = container.querySelector('.input-row:nth-child(1) input').value.trim();
+    const nameValue = container.querySelector('.input-row:nth-child(2) input').value.trim();
+    const countryValue = container.querySelector('.input-row:nth-child(3) input').value.trim();
+    let dateValue = container.querySelector('.input-row:nth-child(4) input').value;
+    
+    // Lấy giá trị từ thẻ select (Đơn vị)
+    const unitSelect = container.querySelector('select');
+    let unitIdValue = parseInt(unitSelect.value); 
+    if (isNaN(unitIdValue)) unitIdValue=null;
 
-    // Xu ly truong hop nguoi dung bo trong o chon ngay
+    // 2. Xử lý logic ngày tháng
     if (!dateValue) {
         dateValue = null; 
     } else {
@@ -51,27 +58,19 @@ function handleSearch() {
         }
     }
 
-    // Xử lÝ: chUYỂN ĐỔI USer id sang int
-    if (unitIdValue) {
-        if (isNaN(userId)) {
-            alert('Mã đơn vị không hợp lệ.');
-            return;
-        }
-        const userId = parseInt(unitIdValue);
-    }
-
-    // BAT BUOC: Cac key phai khop 100% voi ten thuoc tinh trong file Equipment.java
+    // 3. Chuẩn bị object gửi đi (Mapping chính xác với Entity Equipment.java)
+    // Lưu ý: userId trong DB của bạn đang dùng String (VARCHAR) nên không cần parseInt
     const searchCriteria = {
-        equipId: idValue,         // Khop voi private String equipId
-        equipName: nameValue,     // Khop voi private String equipName
-        origin: countryValue,     // Khop voi private String origin
-        dateOfReceipt: dateValue, // Khop voi private LocalDate dateOfReceipt
-        userId: unitIdValue       // Khop voi private String userId
+        equipId: idValue || null,       
+        equipName: nameValue || null,   
+        origin: countryValue || null,   
+        dateOfReceipt: dateValue,       
+        userId: unitIdValue             // Lấy value (1, 2, 3...) từ <option>
     };
 
-    console.log('Dữ liệu JSON gửi đi:', JSON.stringify(searchCriteria));
+    console.log('Dữ liệu tìm kiếm:', searchCriteria);
 
-    // Gui den API cua Spring Boot
+    // 4. Gửi Request đến Backend
     fetch('/api/equipment/search', {
         method: 'POST',
         headers: {
@@ -81,27 +80,42 @@ function handleSearch() {
     })
     .then(response => {
         if (!response.ok) {
-            // Neu van loi, dong nay se in ra thong bao loi chi tiet hon tu server
             return response.text().then(text => { throw new Error(text) });
         }
         return response.json();
     })
     .then(data => {
-        console.log('Kết quả tìm kiếm nhận về:', data);
-        
-        // Goi ham hien thi du lieu len bang (neu co)
-        renderSearchResults(data);
+        console.log('Kết quả:', data);
+        // Kiểm tra nếu có hàm render thì mới gọi
+        if (typeof renderSearchResults === "function") {
+            renderSearchResults(data);
+        } else {
+            console.warn("Chưa định nghĩa hàm renderSearchResults để hiển thị dữ liệu.");
+        }
     })
     .catch(error => {
-        console.error('Lỗi hệ thống:', error.message);
-        alert('Có lỗi xảy ra khi tìm kiếm, vui lòng kiểm tra console.');
+        console.error('Lỗi:', error.message);
+        alert('Lỗi tìm kiếm: ' + error.message);
     });
 }
 
 // Ham ho tro do du lieu vao bang tim kiem de ban kiem tra luon gieo dien
 function renderSearchResults(equipments) {
     const tbody = document.querySelector('#search-section table tbody');
-    tbody.innerHTML = ''; // Xoa cac hang trong hien tai
+    tbody.innerHTML = ''; // Xóa các hàng trống hiện tại
+
+    // 1. Tạo bản đồ mapping giữa ID và Tên đơn vị dựa trên HTML của bạn
+    const unitMap = {
+        "1": "Lãnh đạo Cục",
+        "2": "Văn phòng Cục",
+        "3": "Phòng Đăng ký thuốc",
+        "4": "Phòng Quản lý giá thuốc",
+        "5": "Phòng Quản lý chất lượng thuốc",
+        "6": "Phòng Quản lý kinh doanh dược",
+        "7": "Phòng Quản lý Mỹ phẩm",
+        "8": "Phòng Pháp chế - Hội nhập",
+        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
+    };
 
     if (equipments.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Không tìm thấy thiết bị nào</td></tr>';
@@ -110,15 +124,32 @@ function renderSearchResults(equipments) {
 
     equipments.forEach(item => {
         const row = tbody.insertRow();
+        
+        // Hiển thị các thông tin cơ bản
         row.insertCell(0).textContent = item.equipId || '';
         row.insertCell(1).textContent = item.equipName || '';
         row.insertCell(2).textContent = item.origin || '';
         row.insertCell(3).textContent = item.dateOfReceipt || '';
-        row.insertCell(4).textContent = item.userId || '';
+
+        // 2. Thay đổi: Lấy tên đơn vị từ unitMap dựa trên item.userId
+        // Nếu không tìm thấy tên tương ứng, sẽ hiển thị lại mã ID gốc hoặc để trống
+        const unitName = unitMap[item.userId] || item.userId || 'Chưa xác định';
+        row.insertCell(4).textContent = unitName;
     });
 }
 
 function handleUpdate() {
+    const unitMap = {
+        "Lãnh đạo Cục": "1",
+        "Văn phòng Cục": "2",
+        "Phòng Đăng ký thuốc": "3",
+        "Phòng Quản lý giá thuốc" : "4",
+        "Phòng Quản lý chất lượng thuốc" : "5",
+        "Phòng Quản lý kinh doanh dược": "6",
+        "Phòng Quản lý Mỹ phẩm": "7",
+        "Phòng Pháp chế - Hội nhập": "8",
+        "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm": "9"
+    };
     // Implement update logic here
     // Wrap all rows in the update table into an array of objects and log it to console
     const tableRows = document.querySelectorAll('#update-section table tbody tr');
@@ -130,7 +161,7 @@ function handleUpdate() {
             const name = cells[1].textContent.trim();
             const country = cells[2].textContent.trim();
             const receiveDate = cells[3].textContent.trim();
-            const unitId = cells[4].textContent.trim();
+            const unitId = unitMap[cells[4].textContent.trim()];
             if (equipId && name && country && receiveDate && unitId) { // Only include rows with complete data
                 updateList.push({
                     equipId: equipId,
@@ -175,13 +206,13 @@ function addToUpdateList() {
     const equipId = document.querySelector('#update-section .input-row:nth-child(1) input').value.trim();
     const name = document.querySelector('#update-section .input-row:nth-child(2) input').value.trim();
     const country = document.querySelector('#update-section .input-row:nth-child(3) input').value.trim();
-    const unitId = document.querySelector('#update-section .input-row:nth-child(5) input').value.trim();
+    const unitName = document.querySelector('#update-section select').value.trim();
     // ĐỔI THÀNH 'let' để có thể ghi đè ngày hôm nay nếu người dùng bỏ trống
     let receiveDate = document.querySelector('#update-section .input-row:nth-child(4) input').value;
 
     // Kiểm tra các trường bắt buộc nhập
-    if (!equipId || !name || !country || !unitId) {
-        alert('Vui lòng nhập đầy đủ thông tin thiết bị (Mã, Tên, Nước sản xuất, Mã đơn vị).');
+    if (!equipId || !name || !country || !unitName) {
+        alert('Vui lòng nhập đầy đủ thông tin thiết bị (Mã, Tên, Nước sản xuất, Đơn vị).');
         return;
     }
 
@@ -214,13 +245,13 @@ function addToUpdateList() {
         }
     }
 
-    // handle unitId input
-    if (isNaN(unitId)) {
-        alert('Mã đơn vị phải là số.');
-        return;
-    }
-    // chuyển unitId sang số nguyên để đồng bộ với kiểu dữ liệu backend nếu cần
-    const unitIdInt = parseInt(unitId);
+    // // handle unitId input
+    // if (isNaN(unitId)) {
+    //     alert('Mã đơn vị phải là số.');
+    //     return;
+    // }
+    // // chuyển unitId sang số nguyên để đồng bộ với kiểu dữ liệu backend nếu cần
+    // const unitIdInt = parseInt(unitId);
 
     // BƯỚC QUAN TRỌNG: Gửi một request nhanh lên server kiểm tra xem ID có tồn tại không
     // Bạn có thể tận dụng API tìm kiếm theo ID hoặc một api check tồn tại gọn nhẹ
@@ -241,7 +272,7 @@ function addToUpdateList() {
             newRow.insertCell(1).textContent = name;
             newRow.insertCell(2).textContent = country;
             newRow.insertCell(3).textContent = receiveDate;
-            newRow.insertCell(4).textContent = unitIdInt; // Đổ mã đơn vị vào bảng
+            newRow.insertCell(4).textContent = unitName; // Đổ mã đơn vị vào bảng
 
             const deleteCell = newRow.insertCell(5);
             const deleteBtn = document.createElement('button');

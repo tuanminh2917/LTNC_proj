@@ -34,25 +34,32 @@ body {
     margin-bottom: 20px;
 }
 
+/* Áp dụng cho tất cả input văn bản và select để chúng bằng nhau */
+.input-row input[type="text"],
+.input-row input[type="date"],
+.input-row select {
+    width: 180px;         /* Cố định chiều rộng 180px */
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
+    padding: 4px 8px;
+    border: 1px solid #767676;
+    border-radius: 2px;
+    height: 30px;         /* Đảm bảo chiều cao bằng nhau */
+}
+
+/* Căn chỉnh cho hàng chứa Select */
 .input-row {
     display: flex;
+    justify-content: flex-end; /* Đẩy nội dung sang bên phải */
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    gap: 20px; /* Khoảng cách giữa Label và Input/Select */
 }
 
+/* Đảm bảo Label có độ rộng cố định để các ô Input thẳng hàng */
 .input-row label {
-    color: #0056b3;
     font-weight: bold;
-    margin-right: 15px;
-    width: 120px;
-    text-align: left;
-}
-
-.input-row input {
-    border: 1px solid #0056b3;
-    width: 180px;
-    padding: 4px;
-    outline: none;
+    color: #0056b3;
+    text-align: right;
 }
 
 /* Bảng hiển thị */

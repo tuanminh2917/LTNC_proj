@@ -30,7 +30,8 @@ public class EquipmentService {
         if ((criteria.getEquipId() == null || criteria.getEquipId().isEmpty()) &&
             (criteria.getEquipName() == null || criteria.getEquipName().isEmpty()) &&
             (criteria.getOrigin() == null || criteria.getOrigin().isEmpty()) &&
-            criteria.getDateOfReceipt() == null) {
+            (criteria.getDateOfReceipt() == null) &&
+            (criteria.getUserId() == null)){
 
             return equipmentRepository.findAll();
         }
@@ -40,7 +41,8 @@ public class EquipmentService {
             criteria.getEquipId(),
             criteria.getEquipName(),
             criteria.getOrigin(),
-            criteria.getDateOfReceipt()
+            criteria.getDateOfReceipt(),
+            criteria.getUserId()
         );
     }
 
