@@ -200,13 +200,26 @@ function handleUpdate() {
 }
 
 function addToUpdateList() {
-// Handle adding to update list functionality
+    // Handle adding to update list functionality
+    const unitMap = {
+        "1": "Lãnh đạo Cục",
+        "2": "Văn phòng Cục",
+        "3": "Phòng Đăng ký thuốc",
+        "4": "Phòng Quản lý giá thuốc",
+        "5": "Phòng Quản lý chất lượng thuốc",
+        "6": "Phòng Quản lý kinh doanh dược",
+        "7": "Phòng Quản lý Mỹ phẩm",
+        "8": "Phòng Pháp chế - Hội nhập",
+        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
+    };
     // Implement this logic to add the current input values to the update table
     // Validate input fields (input fields inside update-section )
     const equipId = document.querySelector('#update-section .input-row:nth-child(1) input').value.trim();
     const name = document.querySelector('#update-section .input-row:nth-child(2) input').value.trim();
     const country = document.querySelector('#update-section .input-row:nth-child(3) input').value.trim();
-    const unitName = document.querySelector('#update-section select').value.trim();
+    const unitId = document.querySelector('#update-section select').value.trim();
+
+    let unitName = unitMap[unitId];
     // ĐỔI THÀNH 'let' để có thể ghi đè ngày hôm nay nếu người dùng bỏ trống
     let receiveDate = document.querySelector('#update-section .input-row:nth-child(4) input').value;
 
