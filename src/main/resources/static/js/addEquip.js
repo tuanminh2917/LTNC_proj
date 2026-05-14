@@ -35,6 +35,17 @@ async function loadEquipmentList() {
 }
 
 function renderEquipmentTable(equipmentList) {
+    const unitMap = {
+        "1": "Lãnh đạo Cục",
+        "2": "Văn phòng Cục",
+        "3": "Phòng Đăng ký thuốc",
+        "4": "Phòng Quản lý giá thuốc",
+        "5": "Phòng Quản lý chất lượng thuốc",
+        "6": "Phòng Quản lý kinh doanh dược",
+        "7": "Phòng Quản lý Mỹ phẩm",
+        "8": "Phòng Pháp chế - Hội nhập",
+        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
+    };
     const tableBody = document.getElementById('equipmentTableBody');
     tableBody.innerHTML = '';
 
@@ -55,7 +66,7 @@ function renderEquipmentTable(equipmentList) {
             <td>${equipment.equipName ?? ''}</td>
             <td>${equipment.origin ?? ''}</td>
             <td>${equipment.dateOfReceipt ?? ''}</td>
-            <td>${equipment.userId ?? ''}</td>
+            <td>${unitMap[equipment.userId] ?? ''}</td>
         `;
 
         tableBody.appendChild(row);
@@ -63,21 +74,32 @@ function renderEquipmentTable(equipmentList) {
 }
 
 async function handleAddEquipment() {
+    const unitMap = {
+        "Lãnh đạo Cục": "1",
+        "Văn phòng Cục": "2",
+        "Phòng Đăng ký thuốc": "3",
+        "Phòng Quản lý giá thuốc" : "4",
+        "Phòng Quản lý chất lượng thuốc" : "5",
+        "Phòng Quản lý kinh doanh dược": "6",
+        "Phòng Quản lý Mỹ phẩm": "7",
+        "Phòng Pháp chế - Hội nhập": "8",
+        "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm": "9"
+    };
     const equipId = document.getElementById('equipId').value.trim();
     const equipName = document.getElementById('equipName').value.trim();
     const origin = document.getElementById('origin').value.trim();
     const dateOfReceipt = document.getElementById('dateOfReceipt').value;
-    const userIdValue = document.getElementById('userId').value.trim();
+    const userIdValue = document.getElementById('userOfficialName').value.trim();
 
     if (!equipId || !equipName || !origin || !dateOfReceipt || !userIdValue) {
         alert('Vui lòng nhập đầy đủ thông tin thiết bị.');
         return;
     }
 
-    if (isNaN(userIdValue)) {
-        alert('Mã đơn vị phải là số.');
-        return;
-    }
+    // if (isNaN(userIdValue)) {
+    //     alert('Mã đơn vị phải là số.');
+    //     return;
+    // }
 
     const today = new Date();
     const inputDate = new Date(dateOfReceipt);
@@ -97,6 +119,8 @@ async function handleAddEquipment() {
         dateOfReceipt: dateOfReceipt,
         userId: parseInt(userIdValue)
     };
+
+    console.log(equipment);
 
     try {
         const response = await fetch('/api/equipment/add', {
@@ -126,5 +150,5 @@ function clearForm() {
     document.getElementById('equipName').value = '';
     document.getElementById('origin').value = '';
     document.getElementById('dateOfReceipt').value = '';
-    document.getElementById('userId').value = '';
+    document.getElementById('userOfficialName').value = '';
 }

@@ -61,7 +61,19 @@ h1 {
     font-size: 14px;
 }
 
-.input-row input:focus {
+/* Các thuộc tính bổ sung cho select để khớp với input */
+.input-row select {
+    border: 1px solid #0056b3;
+    padding: 8px;
+    outline: none;
+    font-size: 14px;
+    background-color: white; /* Đảm bảo nền trắng giống input */
+    height: 38px;            /* Khớp chiều cao tổng thể với input (8px padding + line-height) */
+    cursor: pointer;
+}
+
+.input-row input:focus,
+.input-row select:focus {
     border-color: #f0ad4e;
 }
 

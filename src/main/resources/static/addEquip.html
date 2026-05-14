@@ -35,8 +35,20 @@
             </div>
 
             <div class="input-row">
-                <label for="userId">Mã đơn vị</label>
-                <input type="number" id="userId">
+                <label for="userId">Đơn vị</label>
+                <!-- <input type="number" id="userId"> -->
+                 <select id="userOfficialName">
+                    <option value="" selected>Chọn đơn vị</option>
+                    <option value="1">Lãnh đạo Cục</option>
+                    <option value="2">Văn phòng Cục</option>
+                    <option value="3">Phòng Đăng ký thuốc</option>
+                    <option value="4">Phòng Quản lý giá thuốc</option>
+                    <option value="5">Phòng Quản lý chất lượng thuốc</option>
+                    <option value="6">Phòng Quản lý kinh doanh dược</option>
+                    <option value="7">Phòng Quản lý Mỹ phẩm</option>
+                    <option value="8">Phòng Pháp chế - Hội nhập</option>
+                    <option value="9">Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm</option>
+                 </select>
             </div>
 
             <div class="button-group">
@@ -62,7 +74,7 @@
                         <th>Tên thiết bị</th>
                         <th>Nước sản xuất</th>
                         <th>Ngày tiếp nhận</th>
-                        <th>Mã đơn vị</th>
+                        <th>Đơn vị</th>
                     </tr>
                 </thead>
                 <tbody id="equipmentTableBody">
