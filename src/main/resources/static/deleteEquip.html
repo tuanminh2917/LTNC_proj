@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xóa Thiết Bị</title>
+
+    <link rel="stylesheet" href="/css/deleteEquip.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="section-title">
+        Xóa thiết bị
+    </div>
+
+    <div class="input-group-container">
+
+        <div class="input-row">
+            <label>Mã thiết bị</label>
+            <input type="text" id="equipId">
+        </div>
+
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Mã thiết bị</th>
+                <th>Tên</th>
+                <th>Nước sản xuất</th>
+                <th>Ngày tiếp nhận</th>
+                <th>Mã đơn vị</th>
+            </tr>
+        </thead>
+
+        <tbody id="resultBody">
+
+        </tbody>
+
+    </table>
+
+    <div class="footer-actions">
+
+        <button class="btn" id="searchBtn">
+            Tìm kiếm
+        </button>
+
+        <button class="btn btn-delete" id="deleteBtn">
+            Xóa thiết bị
+        </button>
+
+    </div>
+
+</div>
+
+<script src="/js/deleteEquip.js"></script>
+
+</body>
+</html>
