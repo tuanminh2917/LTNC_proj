@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 600px;
+            background-color: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 17px;
+            line-height: 1.8;
+        }
+
+        .info span {
+            color: #004f9e;
+        }
+
+        button {
+            display: block;
+            margin: 30px auto 0 auto;
+            padding: 10px 24px;
+            border: 1px solid #7aa7d9;
+            border-radius: 6px;
+            background-color: #e9f2ff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #d8eaff;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Trang chính hệ thống</h1>
+
+        <div class="info">
+            <p><b>Tài khoản:</b> <span id="username"></span></p>
+            <p><b>Tên đơn vị:</b> <span id="officialName"></span></p>
+            <p><b>Vai trò:</b> <span id="role"></span></p>
+        </div>
+
+        <button onclick="logout()">Đăng xuất</button>
+
+        <p id="message"></p>
+    </div>
+
+    <script>
+        async function checkLogin() {
+            try {
+                const response = await fetch("http://127.0.0.1:3000/api/me", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    window.location.href = "./login.html";
+                    return;
+                }
+
+                document.getElementById("username").textContent = data.user.username;
+                document.getElementById("officialName").textContent = data.user.official_name;
+                document.getElementById("role").textContent = data.user.role;
+
+            } catch (error) {
+                console.error("Check login error:", error);
+                document.getElementById("message").textContent = "Không thể kiểm tra trạng thái đăng nhập";
+                setTimeout(() => {
+                    window.location.href = "./login.html";
+                }, 1000);
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch("http://127.0.0.1:3000/api/logout", {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                window.location.href = "./login.html";
+            } catch (error) {
+                console.error("Logout error:", error);
+                document.getElementById("message").textContent = "Đăng xuất thất bại";
+            }
+        }
+
+        checkLogin();
+    </script>
+
+</body>
+</html>
