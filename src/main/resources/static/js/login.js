@@ -14,13 +14,12 @@ loginForm.addEventListener("submit", async function (event) {
     }
 
     try {
-        // TODO 2: Gửi dữ liệu đăng nhập sang back-end
-        const response = await fetch("http://127.0.0.1:3000/api/login", {
+        // TODO 2: Gửi dữ liệu đăng nhập sang back-end Spring Boot
+        const response = await fetch("/api/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            credentials: "include",
             body: JSON.stringify({
                 username: username,
                 password: password
@@ -39,7 +38,7 @@ loginForm.addEventListener("submit", async function (event) {
         showMessage("Đăng nhập thành công. Đang chuyển hướng...", "success");
 
         setTimeout(() => {
-            window.location.href = "./dashboard.html";
+            window.location.href = "/dashboard.html";
         }, 800);
 
     } catch (error) {
