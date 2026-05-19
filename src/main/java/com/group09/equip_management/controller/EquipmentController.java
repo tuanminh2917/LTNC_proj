@@ -60,5 +60,22 @@ public class EquipmentController {
     public ResponseEntity<List<Equipment>> getAllEquipment() {
         return ResponseEntity.ok(equipmentService.getAllEquipment());
     }
+
+    @DeleteMapping("/delete/{equipId}")
+    public ResponseEntity<String> deleteEquipment(@PathVariable String equipId) {
+
+        Optional<Equipment> equipmentOpt =
+                equipmentService.findById(equipId);
+
+        if (equipmentOpt.isEmpty()) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Khong tim thay thiet bi");
+        }
+
+        equipmentService.deleteEquipment(equipId);
+
+        return ResponseEntity.ok("Xoa thiet bi thanh cong");
     }
+}
 

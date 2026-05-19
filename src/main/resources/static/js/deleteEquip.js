@@ -47,6 +47,18 @@ function handleSearch() {
 
 function renderEquipment(item) {
 
+    const unitMap = {
+        "1": "Lãnh đạo Cục",
+        "2": "Văn phòng Cục",
+        "3": "Phòng Đăng ký thuốc",
+        "4": "Phòng Quản lý giá thuốc",
+        "5": "Phòng Quản lý chất lượng thuốc",
+        "6": "Phòng Quản lý kinh doanh dược",
+        "7": "Phòng Quản lý Mỹ phẩm",
+        "8": "Phòng Pháp chế - Hội nhập",
+        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
+    };
+
     const tbody = document.getElementById('resultBody');
 
     tbody.innerHTML = '';
@@ -57,7 +69,7 @@ function renderEquipment(item) {
     row.insertCell(1).textContent = item.equipName || '';
     row.insertCell(2).textContent = item.origin || '';
     row.insertCell(3).textContent = item.dateOfReceipt || '';
-    row.insertCell(4).textContent = item.userId || '';
+    row.insertCell(4).textContent = unitMap[item.userId] || '';
 }
 
 function handleDelete() {

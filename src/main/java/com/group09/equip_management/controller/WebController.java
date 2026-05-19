@@ -2,6 +2,8 @@ package com.group09.equip_management.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 public class WebController {
@@ -18,4 +20,10 @@ public class WebController {
     public String getAddPage() {
         return "/addEquip.html";
     }
+
+    @GetMapping("/EquipmentList/Delete")
+    public String getDeletePage() {
+        return "/deleteEquip.html";
+    }
+    
 }

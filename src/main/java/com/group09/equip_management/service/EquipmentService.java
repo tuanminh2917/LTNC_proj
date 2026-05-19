@@ -83,4 +83,10 @@ public class EquipmentService {
 
         return equipmentRepository.save(equipment);
     }
+
+    @Transactional
+    public void deleteEquipment(String equipId) {
+
+        equipmentRepository.deleteById(equipId);
+    }
 }
