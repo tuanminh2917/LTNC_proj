@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giao diện Quản lý Thiết bị</title>
     <link rel="stylesheet" href="/css/updateEquip.css">
+    <link rel="stylesheet" href="/css/header.css">
 </head>
 <body>
+    <header>
+        <p id="home-link">Trang chủ</p>
+
+        <div>
+            <p id="unit_name">Đơn vị: <span>{{unitName}}</span></p>
+            <p id="unit_id">Mã đơn vị: <span>{{unitId}}</span></p>
+        </div>
+    </header>
 
     <div class="container" id="search-section">
         <div class="section-title">Tìm kiếm</div>
@@ -92,7 +101,7 @@
             <div class="input-row">
                 <label>Đơn vị</label>
                 <!-- <input type="text"> -->
-                 <select name="" id="">
+                 <select name="" id="userOfficialName-update">
                     <option value="1">Lãnh đạo Cục</option>
                     <option value="2">Văn phòng Cục</option>
                     <option value="3">Phòng Đăng ký thuốc</option>

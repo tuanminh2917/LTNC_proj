@@ -1,11 +1,13 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f0f0f0;
+    margin: 0; /* Xóa margin mặc định của trình duyệt */
+    padding: 0; /* Xóa padding ở body để header sát mép */
 
     display: flex;
-    justify-content: center;
-
-    padding: 30px;
+    flex-direction: column; /* Xếp các thành phần theo hàng dọc */
+    align-items: center;    /* Căn giữa tất cả các hàng theo chiều ngang */
+    min-height: 100vh;      /* Đảm bảo chiều cao phủ hết màn hình */
 }
 
 .container {
@@ -16,9 +18,12 @@ body {
 
     border: 2px solid #333;
 
-    padding: 20px;
+    padding: 30px;           /* Tạo khoảng cách cho nội dung */
 
     box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+
+    margin-top: 20px; /* Tạo khoảng cách giữa header và container */
+    
 }
 
 .section-title {

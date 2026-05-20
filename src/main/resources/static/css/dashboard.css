@@ -1,0 +1,110 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px; /* Thêm khoảng cách 40px giữa hai container */
+}
+
+.container {
+    width: 600px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.info {
+    margin-top: 20px;
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.info span {
+    color: #004f9e;
+}
+
+button {
+    display: block;
+    margin: 30px auto 0 auto;
+    padding: 10px 24px;
+    border: 1px solid #7aa7d9;
+    border-radius: 6px;
+    background-color: #e9f2ff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #d8eaff;
+}
+
+#message {
+    text-align: center;
+    margin-top: 15px;
+    color: red;
+}
+
+/* Ghi đè lại một số thuộc tính của button để phù hợp làm Menu */
+.menu-parent {
+    width: 100%; /* Chiều rộng đầy đủ trong container */
+    margin: 5px 0; /* Khoảng cách giữa các mục */
+    text-align: left; /* Chữ căn trái theo hình vẽ */
+    padding: 12px 20px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Thêm biểu tượng mũi tên nhỏ phía sau */
+.menu-parent::after {
+    content: '▼';
+    font-size: 12px;
+    color: #004f9e;
+}
+
+/* CSS cho menu con */
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    background-color: #ffffff;
+    border-left: 3px solid #7aa7d9; /* Tạo điểm nhấn thụt lề */
+    margin-left: 10px;
+}
+
+.submenu.active {
+    max-height: 200px; /* Độ cao khi mở ra */
+    margin-bottom: 10px;
+}
+
+.sub-option {
+    padding: 10px 10px 10px 30px; /* Thụt vào lề trái */
+    font-size: 15px;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sub-option:hover {
+    background-color: #f0f7ff;
+    color: #004f9e;
+    /*underline khi hover*/
+    text-decoration: underline;
+}

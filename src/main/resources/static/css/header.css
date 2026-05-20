@@ -1,0 +1,29 @@
+header {
+    display: flex;
+    justify-content: space-between; /* Đẩy thành phần đầu về bên trái, cuối về bên phải */
+    align-items: center;
+    padding: 10px 40px;            /* Tăng padding ngang để không bị sát mép màn hình */
+    background-color: #f0f0f0;
+    width: 100%;                   /* Đảm bảo header dàn hết chiều rộng màn hình */
+    box-sizing: border-box;        /* Để padding không làm header bị rộng quá 100% */
+}
+
+header p {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'arial', sans-serif;
+}
+
+header p span {
+    font-weight: normal;
+    color: rgba(98, 0, 255, 0.773);
+}
+
+#home-link {
+    cursor: pointer;
+}
+#home-link:hover {
+    color: rgba(98, 0, 255, 0.773);
+    text-decoration: underline;
+}

@@ -26,4 +26,21 @@ public class WebController {
         return "/deleteEquip.html";
     }
     
+    // Điều hướng trang đăng nhập
+    @GetMapping("/Login")
+    public String getLoginPage() {
+        return "/login.html";
+    }
+
+    // Điều hướng trang dashboard
+    @GetMapping("/Dashboard")
+    public String getDashboardPage() {
+        return "/dashboard.html";
+    }
+
+    // Điều hướng trang chủ (cũng là dashboard)
+    @GetMapping("/")
+    public String getHomePage() {
+        return "/dashboard.html";
+    }
 }

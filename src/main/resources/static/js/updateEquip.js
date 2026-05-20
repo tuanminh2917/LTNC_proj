@@ -1,5 +1,85 @@
+// ==========================================
+// 1. KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
+// ==========================================
+let globalUnitMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
+let globalUnitMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
+
+// ==========================================
+// 2. HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
+// ==========================================
+function loadUnitMapping() {
+    // Gọi fetch bất đồng bộ tới file json đặt tại Front-end
+    return fetch('/userMapping.json')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể tải file userMapping.json');
+            return response.json();
+        })
+        .then(jsonData => {
+            // json của bạn là một mảng gồm 2 object giống nhau, ta lấy object đầu tiên [0]
+            globalUnitMapIdToName = jsonData[0]; 
+            
+            // Tự động tạo bản đồ đảo ngược (Tên -> ID) để phục vụ hàm handleUpdate
+            globalUnitMapNameToId = {};
+            for (const [key, value] of Object.entries(globalUnitMapIdToName)) {
+                globalUnitMapNameToId[value] = key; 
+            }
+            console.log("Đã tải xong cấu hình đơn vị bất đồng bộ!");
+        })
+        .catch(error => {
+            console.error("Lỗi cấu hình hệ thống:", error);
+            alert("Không thể tải danh sách đơn vị. Vui lòng làm mới trang.");
+        });
+}
+
+document.getElementById("home-link").addEventListener("click", function() {
+    window.location.href = "/Dashboard";
+});
+
+// Kiểm tra trạng thái đăng nhập khi trang được tải
+async function checkLogin() {
+    try {
+        const response = await fetch("/api/me", {
+            method: "GET"
+        });
+
+        const data = await response.json();
+
+        console.log("Dữ liệu người dùng:", data);
+
+        if (!data.success) {
+            window.location.href = "/Login";
+            return;
+        }
+        
+        document.getElementById("unit_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
+        document.getElementById("unit_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+
+        // Trong checkLogin() sau khi nhận dữ liệu 'data'
+        const loggedInUnitId = data.user.userId || data.user.unit_id;
+
+        if (loggedInUnitId != 1 && loggedInUnitId != 2) {
+            // Khóa select ở giá trị của đơn vị đang đăng nhập
+            lockSelectElement('userOfficialName-update', loggedInUnitId);
+        }
+
+    } catch (error) {
+        console.error("Check login error:", error);
+        messageElement.textContent = "Không thể kiểm tra trạng thái đăng nhập";
+
+        setTimeout(() => {
+            window.location.href = "/Login";
+        }, 1000);
+    }
+}
+
+// Gọi hàm kiểm tra đăng nhập khi trang được tải
+checkLogin();
+
 // Initialize: Clear table bodies and add event listener for delete buttons
 document.addEventListener('DOMContentLoaded', function() {
+    // GỌI HÀM BẤT ĐỒNG BỘ TẠI ĐÂY
+    loadUnitMapping();
+
     // Clear search results table
     const searchTableBody = document.querySelector('#search-section table tbody');
     searchTableBody.innerHTML = '<tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr>';
@@ -105,17 +185,7 @@ function renderSearchResults(equipments) {
     tbody.innerHTML = ''; // Xóa các hàng trống hiện tại
 
     // 1. Tạo bản đồ mapping giữa ID và Tên đơn vị dựa trên HTML của bạn
-    const unitMap = {
-        "1": "Lãnh đạo Cục",
-        "2": "Văn phòng Cục",
-        "3": "Phòng Đăng ký thuốc",
-        "4": "Phòng Quản lý giá thuốc",
-        "5": "Phòng Quản lý chất lượng thuốc",
-        "6": "Phòng Quản lý kinh doanh dược",
-        "7": "Phòng Quản lý Mỹ phẩm",
-        "8": "Phòng Pháp chế - Hội nhập",
-        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
-    };
+    const unitMap = globalUnitMapIdToName; // Sử dụng biến toàn cục đã tải từ JSON;
 
     if (equipments.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Không tìm thấy thiết bị nào</td></tr>';
@@ -139,17 +209,7 @@ function renderSearchResults(equipments) {
 }
 
 function handleUpdate() {
-    const unitMap = {
-        "Lãnh đạo Cục": "1",
-        "Văn phòng Cục": "2",
-        "Phòng Đăng ký thuốc": "3",
-        "Phòng Quản lý giá thuốc" : "4",
-        "Phòng Quản lý chất lượng thuốc" : "5",
-        "Phòng Quản lý kinh doanh dược": "6",
-        "Phòng Quản lý Mỹ phẩm": "7",
-        "Phòng Pháp chế - Hội nhập": "8",
-        "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm": "9"
-    };
+    const unitMap = globalUnitMapNameToId; // Sử dụng biến toàn cục đã tạo bản đồ đảo ngược (Tên -> ID)
     // Implement update logic here
     // Wrap all rows in the update table into an array of objects and log it to console
     const tableRows = document.querySelectorAll('#update-section table tbody tr');
@@ -201,17 +261,7 @@ function handleUpdate() {
 
 function addToUpdateList() {
     // Handle adding to update list functionality
-    const unitMap = {
-        "1": "Lãnh đạo Cục",
-        "2": "Văn phòng Cục",
-        "3": "Phòng Đăng ký thuốc",
-        "4": "Phòng Quản lý giá thuốc",
-        "5": "Phòng Quản lý chất lượng thuốc",
-        "6": "Phòng Quản lý kinh doanh dược",
-        "7": "Phòng Quản lý Mỹ phẩm",
-        "8": "Phòng Pháp chế - Hội nhập",
-        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
-    };
+    const unitMap = globalUnitMapIdToName; // Sử dụng biến toàn cục đã tải từ JSON để lấy tên đơn vị khi hiển thị trong bảng cập nhật
     // Implement this logic to add the current input values to the update table
     // Validate input fields (input fields inside update-section )
     const equipId = document.querySelector('#update-section .input-row:nth-child(1) input').value.trim();
@@ -258,50 +308,84 @@ function addToUpdateList() {
         }
     }
 
-    // // handle unitId input
-    // if (isNaN(unitId)) {
-    //     alert('Mã đơn vị phải là số.');
-    //     return;
-    // }
-    // // chuyển unitId sang số nguyên để đồng bộ với kiểu dữ liệu backend nếu cần
-    // const unitIdInt = parseInt(unitId);
-
-    // BƯỚC QUAN TRỌNG: Gửi một request nhanh lên server kiểm tra xem ID có tồn tại không
-    // Bạn có thể tận dụng API tìm kiếm theo ID hoặc một api check tồn tại gọn nhẹ
-    fetch(`/api/equipment/check/${equipId}`) 
-        .then(response => {
-            if (response.status === 404) {
-                // Nếu server trả về 404 nghĩa là mã thiết bị không tồn tại
-                throw new Error(`Mã thiết bị '${equipId}' không tồn tại trong hệ thống! Không thể thêm.`);
-            }
-            if (!response.ok) throw new Error('Lỗi kiểm tra thiết bị.');
-            return response.json();
-        })
-        .then(existData => {
-            // Nếu tồn tại hợp lệ, tiến hành chèn hàng vào bảng hiển thị như cũ
-            const tableBody = document.querySelector('#update-section table tbody');
-            const newRow = tableBody.insertRow();
-            newRow.insertCell(0).textContent = equipId;
-            newRow.insertCell(1).textContent = name;
-            newRow.insertCell(2).textContent = country;
-            newRow.insertCell(3).textContent = receiveDate;
-            newRow.insertCell(4).textContent = unitName; // Đổ mã đơn vị vào bảng
-
-            const deleteCell = newRow.insertCell(5);
+    // Kiểm tra nếu mã thiết bị tồn tại hoặc người dùng có quyền cập nhật thiết bị đó trước khi thêm vào danh sách cập nhật
+    isUpdatable(equipId).then(canUpdate => {
+        if (canUpdate) {
+            // Nếu có thể cập nhật, thêm vào bảng cập nhật
+            const tbody = document.querySelector('#update-section table tbody');
+            const row = tbody.insertRow();
+            row.insertCell(0).textContent = equipId;
+            row.insertCell(1).textContent = name;
+            row.insertCell(2).textContent = country;
+            row.insertCell(3).textContent = receiveDate;
+            row.insertCell(4).textContent = unitName;
+            const deleteCell = row.insertCell(5);
             const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Xoá';
+            deleteBtn.textContent = 'Xóa';
             deleteBtn.classList.add('btn', 'btn-delete-row');
             deleteCell.appendChild(deleteBtn);
-            deleteBtn.addEventListener('click', deleteRow);
-        })
-        .catch(error => {
-            alert(error.message); // Thông báo lỗi "Mã thiết bị không tồn tại" cho người dùng
-        });
+        }
+    });
 }
 
 function deleteRow(event) {
     if (event.target.classList.contains('btn-delete-row')) {
         const row = event.target.closest('tr');
         row.remove();
+    }
+}
+
+function lockSelectElement(elementId, valueToLock) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    // 1. Gán giá trị bạn muốn cố định
+    el.value = valueToLock;
+
+    // 2. Chặn tương tác thay đổi giá trị
+    // Lưu lại vị trí đang chọn khi người dùng click vào
+    el.onfocus = function() { 
+        this.defaultIndex = this.selectedIndex; 
+    };
+    // Nếu người dùng cố tình chọn cái khác, lập tức trả về vị trí cũ
+    el.onchange = function() { 
+        this.selectedIndex = this.defaultIndex; 
+    };
+    
+    // 3. Thay đổi giao diện để người dùng biết là không sửa được
+    el.style.backgroundColor = "#e9ecef"; // Màu xám nhạt (giống readonly)
+    el.style.cursor = "not-allowed";      // Biểu tượng chuột cấm
+}
+
+async function isUpdatable(equipId) {
+    loggedInUnitId = document.getElementById("unit_id").querySelector("span").textContent.trim();
+    try {
+        const response = await fetch(`/api/equipment/check/${equipId}`);
+        if (response.status === 404) {
+            alert(`Thiết bị với mã ${equipId} không tồn tại. Vui lòng kiểm tra lại mã thiết bị!`);
+            return false; // Thiết bị không tồn tại, không thể cập nhật
+        }
+        if (!response.ok) {
+            throw new Error('Lỗi khi kiểm tra thiết bị');
+        }
+        // kiểm tra userId của thiết bị trả về có khớp với đơn vị đang đăng nhập không
+        const data = await response.json();
+        console.log('Dữ liệu thiết bị kiểm tra:', data);
+        if (loggedInUnitId === "1" || loggedInUnitId === "2") {
+            // Nếu đơn vị có toàn quyền câp nhật
+            console.log("Đơn vị có toàn quyền cập nhật");
+            return true; // Cho phép cập nhật
+        }
+        if (data.userId === Number(loggedInUnitId)) {
+            console.log("Đơn vị có quyền cập nhật thiết bị này");
+            return true; // Cho phép cập nhật
+        }
+        else {
+            alert(`Bạn không có quyền cập nhật thiết bị này vì nó thuộc đơn vị khác!`);
+            return false; // Không cho phép cập nhật
+        }
+    } catch (error) {
+        console.error('Lỗi khi kiểm tra thiết bị:', error);
+        return false; // Trong trường hợp lỗi, giả định không thể cập nhật để an toàn
     }
 }

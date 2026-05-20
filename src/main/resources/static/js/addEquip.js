@@ -1,7 +1,94 @@
+// ==========================================
+// 1. KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
+// ==========================================
+let globalUnitMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
+let globalUnitMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
+
+// ==========================================
+// 2. HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
+// ==========================================
+function loadUnitMapping() {
+    // Gọi fetch bất đồng bộ tới file json đặt tại Front-end
+    return fetch('/userMapping.json')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể tải file userMapping.json');
+            return response.json();
+        })
+        .then(jsonData => {
+            // json của bạn là một mảng gồm 2 object giống nhau, ta lấy object đầu tiên [0]
+            globalUnitMapIdToName = jsonData[0]; 
+            
+            // Tự động tạo bản đồ đảo ngược (Tên -> ID) để phục vụ hàm handleUpdate
+            globalUnitMapNameToId = {};
+            for (const [key, value] of Object.entries(globalUnitMapIdToName)) {
+                globalUnitMapNameToId[value] = key; 
+            }
+            console.log("Đã tải xong cấu hình đơn vị bất đồng bộ!");
+        })
+        .catch(error => {
+            console.error("Lỗi cấu hình hệ thống:", error);
+            alert("Không thể tải danh sách đơn vị. Vui lòng làm mới trang.");
+        });
+}
+
+loadUnitMapping(); // Gọi hàm này ngay khi script được tải để đảm bảo dữ liệu sẵn sàng cho các hàm khác
+
+document.getElementById("home-link").addEventListener("click", function() {
+    window.location.href = "/Dashboard";
+});
+
+// Kiểm tra trạng thái đăng nhập khi trang được tải
+async function checkLogin() {
+    try {
+        const response = await fetch("/api/me", {
+            method: "GET"
+        });
+
+        const data = await response.json();
+
+        console.log("Dữ liệu người dùng:", data);
+
+        if (!data.success) {
+            window.location.href = "/Login";
+            return;
+        }
+        
+        document.getElementById("unit_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
+        document.getElementById("unit_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+
+        // Trong checkLogin() sau khi nhận dữ liệu 'data'
+        const loggedInUnitId = data.user.userId || data.user.unit_id;
+
+        if (loggedInUnitId != 1 && loggedInUnitId != 2) {
+            // Khóa select ở giá trị của đơn vị đang đăng nhập
+            lockSelectElement('userOfficialName', loggedInUnitId);
+        }
+
+    } catch (error) {
+        console.error("Check login error:", error);
+        messageElement.textContent = "Không thể kiểm tra trạng thái đăng nhập";
+
+        setTimeout(() => {
+            window.location.href = "/Login";
+        }, 1000);
+    }
+}
+
+// Gọi hàm kiểm tra đăng nhập khi trang được tải
+checkLogin();
+
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('addBtn').addEventListener('click', handleAddEquipment);
     document.getElementById('resetBtn').addEventListener('click', clearForm);
     document.getElementById('reloadBtn').addEventListener('click', loadEquipmentList);
+
+    // Kiểm tra mã đơn vị
+    const userId = document.getElementById('unit_id').querySelector("span").textContent;
+    if (userId !== "1" && userId !== "2") { 
+        // Nếu không phải Lãnh đạo Cục hoặc Văn phòng Cục
+        // Đặt giá trị mặc định cho dropdown
+        document.getElementById('userOfficialName').value = userId === "1" ? "Lãnh đạo Cục" : "Văn phòng Cục";
+    }
 
     loadEquipmentList();
 });
@@ -35,17 +122,7 @@ async function loadEquipmentList() {
 }
 
 function renderEquipmentTable(equipmentList) {
-    const unitMap = {
-        "1": "Lãnh đạo Cục",
-        "2": "Văn phòng Cục",
-        "3": "Phòng Đăng ký thuốc",
-        "4": "Phòng Quản lý giá thuốc",
-        "5": "Phòng Quản lý chất lượng thuốc",
-        "6": "Phòng Quản lý kinh doanh dược",
-        "7": "Phòng Quản lý Mỹ phẩm",
-        "8": "Phòng Pháp chế - Hội nhập",
-        "9": "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm"
-    };
+    const unitMap = globalUnitMapIdToName; // Sử dụng bản đồ đã tải bất đồng bộ từ file JSON
     const tableBody = document.getElementById('equipmentTableBody');
     tableBody.innerHTML = '';
 
@@ -74,17 +151,6 @@ function renderEquipmentTable(equipmentList) {
 }
 
 async function handleAddEquipment() {
-    const unitMap = {
-        "Lãnh đạo Cục": "1",
-        "Văn phòng Cục": "2",
-        "Phòng Đăng ký thuốc": "3",
-        "Phòng Quản lý giá thuốc" : "4",
-        "Phòng Quản lý chất lượng thuốc" : "5",
-        "Phòng Quản lý kinh doanh dược": "6",
-        "Phòng Quản lý Mỹ phẩm": "7",
-        "Phòng Pháp chế - Hội nhập": "8",
-        "Trung tâm Đào tạo và hỗ trợ Doanh nghiệp dược, mỹ phẩm": "9"
-    };
     const equipId = document.getElementById('equipId').value.trim();
     const equipName = document.getElementById('equipName').value.trim();
     const origin = document.getElementById('origin').value.trim();
@@ -143,6 +209,28 @@ async function handleAddEquipment() {
         console.error('Lỗi thêm thiết bị:', error);
         alert(error.message || 'Có lỗi xảy ra khi thêm thiết bị.');
     }
+}
+
+function lockSelectElement(elementId, valueToLock) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    // 1. Gán giá trị bạn muốn cố định
+    el.value = valueToLock;
+
+    // 2. Chặn tương tác thay đổi giá trị
+    // Lưu lại vị trí đang chọn khi người dùng click vào
+    el.onfocus = function() { 
+        this.defaultIndex = this.selectedIndex; 
+    };
+    // Nếu người dùng cố tình chọn cái khác, lập tức trả về vị trí cũ
+    el.onchange = function() { 
+        this.selectedIndex = this.defaultIndex; 
+    };
+    
+    // 3. Thay đổi giao diện để người dùng biết là không sửa được
+    el.style.backgroundColor = "#e9ecef"; // Màu xám nhạt (giống readonly)
+    el.style.cursor = "not-allowed";      // Biểu tượng chuột cấm
 }
 
 function clearForm() {

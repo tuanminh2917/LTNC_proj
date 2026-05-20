@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Trang chính hệ thống</h1>
+
+        <div class="info">
+            <p><b>Tài khoản:</b> <span id="username"></span></p>
+            <p><b>Tên đơn vị:</b> <span id="officialName"></span></p>
+            <p><b>Vai trò:</b> <span id="role"></span></p>
+        </div>
+
+        <button id="logoutBtn">Đăng xuất</button>
+
+        <p id="message"></p>
+    </div>
+
+    <div class="container">
+    <h1>Quản lý Hệ thống</h1>
+
+    <button class="menu-parent" onclick="toggleEquipmentListMenu()">
+        Danh sách trang thiết bị
+    </button>
+    
+    <div class="submenu" id="equipmentSubmenu">
+        <div class="sub-option" id="addEquip">Thêm thiết bị</div>
+        <div class="sub-option" id="updateEquip">Cập nhật thông tin thiết bị</div>
+        <div class="sub-option" id="deleteEquip">Xoá thiết bị</div>
+    </div>
+
+    <button class="menu-parent">Hồ sơ trang thiết bị</button>
+    <button class="menu-parent">Bảo dưỡng, sửa chữa</button>
+
+    <div id="message"></div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
