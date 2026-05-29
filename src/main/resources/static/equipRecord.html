@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ho So Trang Thiet Bi V2</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #ffffff;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #000000;
+            background-color: #ffffff;
+        }
+        .container {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            font-size: 22pt;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+        .info-section {
+            margin-bottom: 30px;
+            font-size: 12pt;
+        }
+        .info-row {
+            margin-bottom: 15px;
+            display: block;
+        }
+        .label {
+            font-weight: bold;
+            color: #000000;
+        }
+        .field-line {
+            display: inline-block;
+            border-bottom: 1px dotted #000;
+            min-width: 250px;
+        }
+        .flex-row {
+            display: table;
+            width: 100%;
+        }
+        .flex-cell {
+            display: table-cell;
+            vertical-align: bottom;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #ffffff;
+        }
+        th {
+            border: 1.5px solid #0056b3;
+            padding: 12px 5px;
+            color: #0056b3;
+            text-transform: uppercase;
+            font-size: 11pt;
+            background-color: #ffffff;
+        }
+        td {
+            border: 1px solid #d9534f;
+            padding: 15px 8px;
+            text-align: center;
+            font-size: 11pt;
+            background-color: #ffffff;
+        }
+        .stt { width: 8%; }
+        .date { width: 20%; }
+        .content { width: 47%; text-align: left; }
+        .person { width: 25%; }
+
+        .footer {
+            margin-top: 50px;
+            text-align: right;
+            font-size: 9pt;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HỒ SƠ TRANG THIẾT BỊ</h1>
+        
+        <div class="info-section">
+            <div class="info-row">
+                <span class="label">- Tên trang thiết bị:</span>
+                <span class="field-line" style="width: 70%;"></span>
+            </div>
+            
+            <div class="flex-row" style="margin-bottom: 15px;">
+                <div class="flex-cell" style="width: 50%;">
+                    <span class="label">- Mã số:</span>
+                    <span class="field-line" style="width: 60%;"></span>
+                </div>
+                <div class="flex-cell" style="width: 50%; text-align: right;">
+                    <span class="label">Ngày nhận:</span>
+                    <span class="field-line" style="width: 55%;"></span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <span class="label">- Đơn vị sử dụng:</span>
+                <span class="field-line" style="width: 71%;"></span>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="stt">STT</th>
+                    <th class="date">Ngày thực hiện</th>
+                    <th class="content">Nội dung bảo trì, sửa chữa</th>
+                    <th class="person">Người thực hiện</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td></td><td></td><td></td></tr>
+                <tr><td>2</td><td></td><td></td><td></td></tr>
+                <tr><td>3</td><td></td><td></td><td></td></tr>
+                <tr><td>4</td><td></td><td></td><td></td></tr>
+                <tr><td>5</td><td></td><td></td><td></td></tr>
+                <tr><td>...</td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            Mã hiệu: QT_QLD_09_01
+        </div>
+    </div>
+</body>
+</html>
