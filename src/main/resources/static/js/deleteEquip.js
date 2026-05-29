@@ -1,41 +1,59 @@
+// I. Variables and Constants
 // ==========================================
-// 1. KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
+// KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
 // ==========================================
-let globalUnitMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
-let globalUnitMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
+let globalUserMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
+let globalUserMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
 
-// ==========================================
-// 2. HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
-// ==========================================
-function loadUnitMapping() {
-    // Gọi fetch bất đồng bộ tới file json đặt tại Front-end
-    return fetch('/userMapping.json')
-        .then(response => {
-            if (!response.ok) throw new Error('Không thể tải file userMapping.json');
-            return response.json();
-        })
-        .then(jsonData => {
-            // json của bạn là một mảng gồm 2 object giống nhau, ta lấy object đầu tiên [0]
-            globalUnitMapIdToName = jsonData[0]; 
-            
-            // Tự động tạo bản đồ đảo ngược (Tên -> ID) để phục vụ hàm handleUpdate
-            globalUnitMapNameToId = {};
-            for (const [key, value] of Object.entries(globalUnitMapIdToName)) {
-                globalUnitMapNameToId[value] = key; 
-            }
-            console.log("Đã tải xong cấu hình đơn vị bất đồng bộ!");
-        })
-        .catch(error => {
-            console.error("Lỗi cấu hình hệ thống:", error);
-            alert("Không thể tải danh sách đơn vị. Vui lòng làm mới trang.");
-        });
-}
+let globalUserList = [];
 
-loadUnitMapping(); // Gọi hàm này ngay khi script được tải để đảm bảo dữ liệu sẵn sàng cho các hàm khác
+// II. Functions calls
+
+loadUserMapping(); // Gọi hàm này ngay khi script được tải để đảm bảo dữ liệu sẵn sàng cho các hàm khác
 
 document.getElementById("home-link").addEventListener("click", function() {
     window.location.href = "/Dashboard";
 });
+
+// Gọi hàm kiểm tra đăng nhập khi trang được tải
+checkLogin();
+
+let currentEquipId = null;
+
+document.getElementById('searchBtn').addEventListener('click', handleSearch);
+
+document.getElementById('deleteBtn').addEventListener('click', handleDelete);
+
+// III. Functions definitions
+// ==========================================
+// HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
+// ==========================================
+function loadUserMapping() {
+    // fetch đến route: /api/users/all
+    return fetch('/api/users/all')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể tải danh sách người dùng từ server');
+        return response.json();
+        })
+        .then(users => {
+            // Xử lý dữ liệu người dùng ở đây
+            console.log("Danh sách người dùng:", users);
+            // Đưa dữ liệu vào các biến toàn cục để sử dụng trong các hàm khác
+            globalUserList = users;
+            globalUserMapIdToName = {};
+            globalUserMapNameToId = {};
+            users.forEach(user => {
+                globalUserMapIdToName[user.userId] = user.officialName || user.unit_name;
+                globalUserMapNameToId[user.officialName || user.unit_name] = user.userId;
+            });
+        })
+        .catch(error => {
+            console.error("Lỗi khi tải danh sách người dùng:", error);
+            alert("Không thể tải danh sách người dùng. Vui lòng làm mới trang.");
+        });
+};
+
+
 
 // Kiểm tra trạng thái đăng nhập khi trang được tải
 async function checkLogin() {
@@ -53,8 +71,9 @@ async function checkLogin() {
             return;
         }
         
-        document.getElementById("unit_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
-        document.getElementById("unit_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+        document.getElementById("user_official_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
+        document.getElementById("user_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+        document.getElementById("user_role").querySelector("span").textContent = data.user.role || data.user.unit_role;
 
     } catch (error) {
         console.error("Check login error:", error);
@@ -65,15 +84,6 @@ async function checkLogin() {
         }, 1000);
     }
 }
-
-// Gọi hàm kiểm tra đăng nhập khi trang được tải
-checkLogin();
-
-let currentEquipId = null;
-
-document.getElementById('searchBtn').addEventListener('click', handleSearch);
-
-document.getElementById('deleteBtn').addEventListener('click', handleDelete);
 
 function handleSearch() {
 
@@ -118,7 +128,7 @@ function handleSearch() {
 
 function renderEquipment(item) {
 
-    const unitMap = globalUnitMapIdToName; // Sử dụng bản đồ đã tải bất đồng bộ từ file JSON
+    const unitMap = globalUserMapIdToName; // Sử dụng bản đồ đã tải bất đồng bộ từ file JSON
 
     const tbody = document.getElementById('resultBody');
 
@@ -182,7 +192,8 @@ async function handleDelete() {
 }
 
 async function isDeletable(equipId) {
-    loggedInUnitId = document.getElementById("unit_id").querySelector("span").textContent.trim();
+    let loggedInUserId = document.getElementById("user_id").querySelector("span").textContent.trim();
+    let loggedInUserRole = document.getElementById("user_role").querySelector("span").textContent.trim();
     try {
         const response = await fetch(`/api/equipment/check/${equipId}`);
         if (response.status === 404) {
@@ -192,16 +203,16 @@ async function isDeletable(equipId) {
         if (!response.ok) {
             throw new Error('Lỗi khi kiểm tra thiết bị');
         }
-        // kiểm tra userId của thiết bị trả về có khớp với đơn vị đang đăng nhập không
+        // kiểm tra userId của thiết bị trả về có khớp với người dùng đang đăng nhập không
         const data = await response.json();
         console.log('Dữ liệu thiết bị kiểm tra:', data);
-        if (loggedInUnitId === "1" || loggedInUnitId === "2") {
-            // Nếu đơn vị có toàn quyền câp nhật
-            console.log("Đơn vị có toàn quyền xóa");
+        if (loggedInUserRole === "Lãnh đạo" || loggedInUserRole === "Văn phòng") {
+            // Nếu người dùng có toàn quyền câp nhật
+            console.log("Người dùng có toàn quyền xóa");
             return true; // Cho phép xóa
         }
-        if (data.userId === Number(loggedInUnitId)) {
-            console.log("Đơn vị có quyền xóa thiết bị này");
+        if (data.userId === Number(loggedInUserId)) {
+            console.log("Người dùng có quyền xóa thiết bị này");
             return true; // Cho phép xóa
         }
         else {

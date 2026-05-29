@@ -1,41 +1,72 @@
-// ==========================================
-// 1. KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
-// ==========================================
-let globalUnitMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
-let globalUnitMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
+// I. Variables and Constants
 
 // ==========================================
-// 2. HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
+// KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
 // ==========================================
-function loadUnitMapping() {
-    // Gọi fetch bất đồng bộ tới file json đặt tại Front-end
-    return fetch('/userMapping.json')
-        .then(response => {
-            if (!response.ok) throw new Error('Không thể tải file userMapping.json');
-            return response.json();
-        })
-        .then(jsonData => {
-            // json của bạn là một mảng gồm 2 object giống nhau, ta lấy object đầu tiên [0]
-            globalUnitMapIdToName = jsonData[0]; 
-            
-            // Tự động tạo bản đồ đảo ngược (Tên -> ID) để phục vụ hàm handleUpdate
-            globalUnitMapNameToId = {};
-            for (const [key, value] of Object.entries(globalUnitMapIdToName)) {
-                globalUnitMapNameToId[value] = key; 
-            }
-            console.log("Đã tải xong cấu hình đơn vị bất đồng bộ!");
-        })
-        .catch(error => {
-            console.error("Lỗi cấu hình hệ thống:", error);
-            alert("Không thể tải danh sách đơn vị. Vui lòng làm mới trang.");
-        });
-}
+let globalUserMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
+let globalUserMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
 
-loadUnitMapping(); // Gọi hàm này ngay khi script được tải để đảm bảo dữ liệu sẵn sàng cho các hàm khác
+let globalUserList = [];
+
+// II. Functions calls
+
+loadUserMapping(); // Gọi hàm này ngay khi script được tải để đảm bảo dữ liệu sẵn sàng cho các hàm khác
 
 document.getElementById("home-link").addEventListener("click", function() {
     window.location.href = "/Dashboard";
 });
+
+// Gọi hàm kiểm tra đăng nhập khi trang được tải
+checkLogin();
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('addBtn').addEventListener('click', handleAddEquipment);
+    document.getElementById('resetBtn').addEventListener('click', clearForm);
+    document.getElementById('reloadBtn').addEventListener('click', loadEquipmentList);
+
+    // Kiểm tra mã người dùng
+    const userId = document.getElementById('user_id').querySelector("span").textContent;
+    const userRole = document.getElementById('user_role').querySelector("span").textContent;
+    if (userRole !== "Lãnh đạo" && userRole !== "Văn phòng") {
+        // Nếu không phải Lãnh đạo Cục hoặc Văn phòng Cục
+        // Đặt giá trị mặc định cho dropdown
+        document.getElementById('userOfficialName').value = userId === "1" ? "Lãnh đạo Cục" : "Văn phòng Cục";
+    }
+
+    loadEquipmentList();
+});
+
+// III. Functions definitions
+
+// ==========================================
+// HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
+// ==========================================
+function loadUserMapping() {
+    // fetch đến route: /api/users/all
+    return fetch('/api/users/all')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể tải danh sách người dùng từ server');
+        return response.json();
+        })
+        .then(users => {
+            // Xử lý dữ liệu người dùng ở đây
+            console.log("Danh sách người dùng:", users);
+            // Đưa dữ liệu vào các biến toàn cục để sử dụng trong các hàm khác
+            globalUserList = users;
+            globalUserMapIdToName = {};
+            globalUserMapNameToId = {};
+            users.forEach(user => {
+                globalUserMapIdToName[user.userId] = user.officialName || user.unit_name;
+                globalUserMapNameToId[user.officialName || user.unit_name] = user.userId;
+            });
+        })
+        .catch(error => {
+            console.error("Lỗi khi tải danh sách người dùng:", error);
+            alert("Không thể tải danh sách người dùng. Vui lòng làm mới trang.");
+        });
+};
+
+
 
 // Kiểm tra trạng thái đăng nhập khi trang được tải
 async function checkLogin() {
@@ -53,15 +84,17 @@ async function checkLogin() {
             return;
         }
         
-        document.getElementById("unit_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
-        document.getElementById("unit_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+        document.getElementById("user_official_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
+        document.getElementById("user_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+        document.getElementById("user_role").querySelector("span").textContent = data.user.role || data.user.unit_role;
 
         // Trong checkLogin() sau khi nhận dữ liệu 'data'
-        const loggedInUnitId = data.user.userId || data.user.unit_id;
+        const loggedInUserId = data.user.userId || data.user.unit_id;
+        const loggedInUserRole = data.user.role || data.user.unit_role;
 
-        if (loggedInUnitId != 1 && loggedInUnitId != 2) {
+        if (loggedInUserRole !== "Lãnh đạo" && loggedInUserRole !== "Văn phòng") {
             // Khóa select ở giá trị của đơn vị đang đăng nhập
-            lockSelectElement('userOfficialName', loggedInUnitId);
+            lockSelectElement('userOfficialName', loggedInUserId);
         }
 
     } catch (error) {
@@ -74,24 +107,7 @@ async function checkLogin() {
     }
 }
 
-// Gọi hàm kiểm tra đăng nhập khi trang được tải
-checkLogin();
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('addBtn').addEventListener('click', handleAddEquipment);
-    document.getElementById('resetBtn').addEventListener('click', clearForm);
-    document.getElementById('reloadBtn').addEventListener('click', loadEquipmentList);
-
-    // Kiểm tra mã đơn vị
-    const userId = document.getElementById('unit_id').querySelector("span").textContent;
-    if (userId !== "1" && userId !== "2") { 
-        // Nếu không phải Lãnh đạo Cục hoặc Văn phòng Cục
-        // Đặt giá trị mặc định cho dropdown
-        document.getElementById('userOfficialName').value = userId === "1" ? "Lãnh đạo Cục" : "Văn phòng Cục";
-    }
-
-    loadEquipmentList();
-});
 
 async function loadEquipmentList() {
     const tableBody = document.getElementById('equipmentTableBody');
@@ -122,7 +138,7 @@ async function loadEquipmentList() {
 }
 
 function renderEquipmentTable(equipmentList) {
-    const unitMap = globalUnitMapIdToName; // Sử dụng bản đồ đã tải bất đồng bộ từ file JSON
+    const userMap = globalUserMapIdToName; // Sử dụng bản đồ đã tải bất đồng bộ từ file JSON
     const tableBody = document.getElementById('equipmentTableBody');
     tableBody.innerHTML = '';
 
@@ -143,7 +159,7 @@ function renderEquipmentTable(equipmentList) {
             <td>${equipment.equipName ?? ''}</td>
             <td>${equipment.origin ?? ''}</td>
             <td>${equipment.dateOfReceipt ?? ''}</td>
-            <td>${unitMap[equipment.userId] ?? ''}</td>
+            <td>${userMap[equipment.userId] ?? ''}</td>
         `;
 
         tableBody.appendChild(row);

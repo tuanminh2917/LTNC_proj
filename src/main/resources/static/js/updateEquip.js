@@ -1,76 +1,17 @@
-// ==========================================
-// 1. KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH ĐƠN VỊ
-// ==========================================
-let globalUnitMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
-let globalUnitMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
+// I. Variables and Constants
+// // ==========================================
+// // KHAI BÁO BIẾN TOÀN CỤC CHỨA CẤU HÌNH NGƯỜI DÙNG
+// // ==========================================
+let globalUserMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
+let globalUserMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
 
-// ==========================================
-// 2. HÀM BẤT ĐỒNG BỘ ĐỌC FILE JSON TỪ SERVER
-// ==========================================
-function loadUnitMapping() {
-    // Gọi fetch bất đồng bộ tới file json đặt tại Front-end
-    return fetch('/userMapping.json')
-        .then(response => {
-            if (!response.ok) throw new Error('Không thể tải file userMapping.json');
-            return response.json();
-        })
-        .then(jsonData => {
-            // json của bạn là một mảng gồm 2 object giống nhau, ta lấy object đầu tiên [0]
-            globalUnitMapIdToName = jsonData[0]; 
-            
-            // Tự động tạo bản đồ đảo ngược (Tên -> ID) để phục vụ hàm handleUpdate
-            globalUnitMapNameToId = {};
-            for (const [key, value] of Object.entries(globalUnitMapIdToName)) {
-                globalUnitMapNameToId[value] = key; 
-            }
-            console.log("Đã tải xong cấu hình đơn vị bất đồng bộ!");
-        })
-        .catch(error => {
-            console.error("Lỗi cấu hình hệ thống:", error);
-            alert("Không thể tải danh sách đơn vị. Vui lòng làm mới trang.");
-        });
-}
+let globalUserList = []; // Dùng để lưu danh sách người dùng lấy từ server, phục vụ cho cả renderSearchResults và handleUpdate
+
+// II. Functions calls
 
 document.getElementById("home-link").addEventListener("click", function() {
     window.location.href = "/Dashboard";
 });
-
-// Kiểm tra trạng thái đăng nhập khi trang được tải
-async function checkLogin() {
-    try {
-        const response = await fetch("/api/me", {
-            method: "GET"
-        });
-
-        const data = await response.json();
-
-        console.log("Dữ liệu người dùng:", data);
-
-        if (!data.success) {
-            window.location.href = "/Login";
-            return;
-        }
-        
-        document.getElementById("unit_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
-        document.getElementById("unit_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
-
-        // Trong checkLogin() sau khi nhận dữ liệu 'data'
-        const loggedInUnitId = data.user.userId || data.user.unit_id;
-
-        if (loggedInUnitId != 1 && loggedInUnitId != 2) {
-            // Khóa select ở giá trị của đơn vị đang đăng nhập
-            lockSelectElement('userOfficialName-update', loggedInUnitId);
-        }
-
-    } catch (error) {
-        console.error("Check login error:", error);
-        messageElement.textContent = "Không thể kiểm tra trạng thái đăng nhập";
-
-        setTimeout(() => {
-            window.location.href = "/Login";
-        }, 1000);
-    }
-}
 
 // Gọi hàm kiểm tra đăng nhập khi trang được tải
 checkLogin();
@@ -78,7 +19,7 @@ checkLogin();
 // Initialize: Clear table bodies and add event listener for delete buttons
 document.addEventListener('DOMContentLoaded', function() {
     // GỌI HÀM BẤT ĐỒNG BỘ TẠI ĐÂY
-    loadUnitMapping();
+    loadUserMapping();
 
     // Clear search results table
     const searchTableBody = document.querySelector('#search-section table tbody');
@@ -107,6 +48,76 @@ document.getElementById('updateBtn').addEventListener('click', function() {
     handleUpdate();
 });
 
+// III. Functions definitions
+
+function loadUserMapping() {
+    // fetch đến route: /api/users/all
+    return fetch('/api/users/all')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể tải danh sách người dùng từ server');
+        return response.json();
+        })
+        .then(users => {
+            // Xử lý dữ liệu người dùng ở đây
+            console.log("Danh sách người dùng:", users);
+            // Đưa dữ liệu vào các biến toàn cục để sử dụng trong các hàm khác
+            globalUserList = users;
+            globalUserMapIdToName = {};
+            globalUserMapNameToId = {};
+            users.forEach(user => {
+                globalUserMapIdToName[user.userId] = user.officialName || user.unit_name;
+                globalUserMapNameToId[user.officialName || user.unit_name] = user.userId;
+            });
+        })
+        .catch(error => {
+            console.error("Lỗi khi tải danh sách người dùng:", error);
+            alert("Không thể tải danh sách người dùng. Vui lòng làm mới trang.");
+        });
+};
+
+
+
+// Kiểm tra trạng thái đăng nhập khi trang được tải
+async function checkLogin() {
+    try {
+        const response = await fetch("/api/me", {
+            method: "GET"
+        });
+
+        const data = await response.json();
+
+        console.log("Dữ liệu người dùng:", data);
+
+        if (!data.success) {
+            window.location.href = "/Login";
+            return;
+        }
+        
+        document.getElementById("user_official_name").querySelector("span").textContent = data.user.officialName || data.user.unit_name;
+        document.getElementById("user_id").querySelector("span").textContent = data.user.userId || data.user.unit_id;
+        document.getElementById("user_role").querySelector("span").textContent = data.user.role || data.user.unit_role;
+
+        // Trong checkLogin() sau khi nhận dữ liệu 'data'
+        const loggedInUserRole = data.user.role || data.user.unit_role;
+        const loggedInUserId = data.user.userId || data.user.unit_id;
+
+        if (loggedInUserRole !== "Lãnh đạo" && loggedInUserRole !== "Văn phòng") {
+            // Khóa select ở giá trị của đơn vị đang đăng nhập
+            lockSelectElement('userOfficialName-update', loggedInUserId);
+        }
+
+    } catch (error) {
+        console.error("Check login error:", error);
+        alert("Không thể kiểm tra trạng thái đăng nhập");
+
+        setTimeout(() => {
+            window.location.href = "/Login";
+        }, 1000);
+    }
+}
+
+
+
 function handleSearch() {
     // 1. Lấy giá trị từ các ô input thông qua Selector chính xác hơn
     // Sử dụng ID của container cha (giả sử là #search-section) để tránh lấy nhầm input ở phần khác
@@ -118,9 +129,9 @@ function handleSearch() {
     let dateValue = container.querySelector('.input-row:nth-child(4) input').value;
     
     // Lấy giá trị từ thẻ select (Đơn vị)
-    const unitSelect = container.querySelector('select');
-    let unitIdValue = parseInt(unitSelect.value); 
-    if (isNaN(unitIdValue)) unitIdValue=null;
+    const userSelect = container.querySelector('select');
+    let userIdValue = parseInt(userSelect.value); 
+    if (isNaN(userIdValue)) userIdValue=null;
 
     // 2. Xử lý logic ngày tháng
     if (!dateValue) {
@@ -145,7 +156,7 @@ function handleSearch() {
         equipName: nameValue || null,   
         origin: countryValue || null,   
         dateOfReceipt: dateValue,       
-        userId: unitIdValue             // Lấy value (1, 2, 3...) từ <option>
+        userId: userIdValue             // Lấy value (1, 2, 3...) từ <option>
     };
 
     console.log('Dữ liệu tìm kiếm:', searchCriteria);
@@ -185,7 +196,7 @@ function renderSearchResults(equipments) {
     tbody.innerHTML = ''; // Xóa các hàng trống hiện tại
 
     // 1. Tạo bản đồ mapping giữa ID và Tên đơn vị dựa trên HTML của bạn
-    const unitMap = globalUnitMapIdToName; // Sử dụng biến toàn cục đã tải từ JSON;
+    const userMap = globalUserMapIdToName; // Sử dụng biến toàn cục đã tải từ JSON;
 
     if (equipments.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Không tìm thấy thiết bị nào</td></tr>';
@@ -201,15 +212,15 @@ function renderSearchResults(equipments) {
         row.insertCell(2).textContent = item.origin || '';
         row.insertCell(3).textContent = item.dateOfReceipt || '';
 
-        // 2. Thay đổi: Lấy tên đơn vị từ unitMap dựa trên item.userId
+        // 2. Thay đổi: Lấy tên người dùng từ userMap dựa trên item.userId
         // Nếu không tìm thấy tên tương ứng, sẽ hiển thị lại mã ID gốc hoặc để trống
-        const unitName = unitMap[item.userId] || item.userId || 'Chưa xác định';
-        row.insertCell(4).textContent = unitName;
+        const userOfficialName = userMap[item.userId] || item.userId || 'Chưa xác định';
+        row.insertCell(4).textContent = userOfficialName;
     });
 }
 
 function handleUpdate() {
-    const unitMap = globalUnitMapNameToId; // Sử dụng biến toàn cục đã tạo bản đồ đảo ngược (Tên -> ID)
+    const userMap = globalUserMapNameToId; // Sử dụng biến toàn cục đã tạo bản đồ đảo ngược (Tên -> ID)
     // Implement update logic here
     // Wrap all rows in the update table into an array of objects and log it to console
     const tableRows = document.querySelectorAll('#update-section table tbody tr');
@@ -221,14 +232,14 @@ function handleUpdate() {
             const name = cells[1].textContent.trim();
             const country = cells[2].textContent.trim();
             const receiveDate = cells[3].textContent.trim();
-            const unitId = unitMap[cells[4].textContent.trim()];
-            if (equipId && name && country && receiveDate && unitId) { // Only include rows with complete data
+            const userId = userMap[cells[4].textContent.trim()];
+            if (equipId && name && country && receiveDate && userId) { // Only include rows with complete data
                 updateList.push({
                     equipId: equipId,
                     equipName: name,
                     origin: country,
                     dateOfReceipt: receiveDate,
-                    userId: unitId
+                    userId: userId
                 });
             }
         }
@@ -261,20 +272,20 @@ function handleUpdate() {
 
 function addToUpdateList() {
     // Handle adding to update list functionality
-    const unitMap = globalUnitMapIdToName; // Sử dụng biến toàn cục đã tải từ JSON để lấy tên đơn vị khi hiển thị trong bảng cập nhật
+    const userMap = globalUserMapIdToName; // Sử dụng biến toàn cục đã tải từ JSON để lấy tên người dùng khi hiển thị trong bảng cập nhật
     // Implement this logic to add the current input values to the update table
     // Validate input fields (input fields inside update-section )
     const equipId = document.querySelector('#update-section .input-row:nth-child(1) input').value.trim();
     const name = document.querySelector('#update-section .input-row:nth-child(2) input').value.trim();
     const country = document.querySelector('#update-section .input-row:nth-child(3) input').value.trim();
-    const unitId = document.querySelector('#update-section select').value.trim();
+    const userId = document.querySelector('#update-section select').value.trim();
 
-    let unitName = unitMap[unitId];
+    let userOfficialName = userMap[userId] || userId; // Lấy tên người dùng từ userMap, nếu không tìm thấy thì hiển thị ID
     // ĐỔI THÀNH 'let' để có thể ghi đè ngày hôm nay nếu người dùng bỏ trống
     let receiveDate = document.querySelector('#update-section .input-row:nth-child(4) input').value;
 
     // Kiểm tra các trường bắt buộc nhập
-    if (!equipId || !name || !country || !unitName) {
+    if (!equipId || !name || !country || !userOfficialName) {
         alert('Vui lòng nhập đầy đủ thông tin thiết bị (Mã, Tên, Nước sản xuất, Đơn vị).');
         return;
     }
@@ -318,7 +329,7 @@ function addToUpdateList() {
             row.insertCell(1).textContent = name;
             row.insertCell(2).textContent = country;
             row.insertCell(3).textContent = receiveDate;
-            row.insertCell(4).textContent = unitName;
+            row.insertCell(4).textContent = userOfficialName; // Hiển thị tên người dùng thay vì ID
             const deleteCell = row.insertCell(5);
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Xóa';
@@ -358,7 +369,8 @@ function lockSelectElement(elementId, valueToLock) {
 }
 
 async function isUpdatable(equipId) {
-    loggedInUnitId = document.getElementById("unit_id").querySelector("span").textContent.trim();
+    let loggedInUserRole = document.getElementById("user_role").querySelector("span").textContent.trim();
+    let loggedInUserId = document.getElementById("user_id").querySelector("span").textContent.trim();
     try {
         const response = await fetch(`/api/equipment/check/${equipId}`);
         if (response.status === 404) {
@@ -371,12 +383,12 @@ async function isUpdatable(equipId) {
         // kiểm tra userId của thiết bị trả về có khớp với đơn vị đang đăng nhập không
         const data = await response.json();
         console.log('Dữ liệu thiết bị kiểm tra:', data);
-        if (loggedInUnitId === "1" || loggedInUnitId === "2") {
+        if (loggedInUserRole === "Lãnh đạo" || loggedInUserRole === "Văn phòng") {
             // Nếu đơn vị có toàn quyền câp nhật
             console.log("Đơn vị có toàn quyền cập nhật");
             return true; // Cho phép cập nhật
         }
-        if (data.userId === Number(loggedInUnitId)) {
+        if (data.userId === Number(loggedInUserId)) {
             console.log("Đơn vị có quyền cập nhật thiết bị này");
             return true; // Cho phép cập nhật
         }
