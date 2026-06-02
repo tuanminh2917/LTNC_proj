@@ -25,7 +25,12 @@ public class WebController {
     public String getDeletePage() {
         return "/deleteEquip.html";
     }
-    
+
+    @GetMapping("/EquipmentRecord")
+    public String getEquipRecordPage() {
+        return "/equipRecord.html";
+    }
+
     // Điều hướng trang đăng nhập
     @GetMapping("/Login")
     public String getLoginPage() {

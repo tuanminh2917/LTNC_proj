@@ -85,6 +85,24 @@ function toggleEquipmentListMenu() {
     }
 }
 
+function toggleEquipRecordMenu() {
+    const submenu = document.getElementById('equipRecordSubmenu');
+    if (!submenu) {
+        console.error("Không tìm thấy submenu với id 'equipRecordSubmenu'");
+        return;
+    }
+
+    if (!isAbleToAccess(['Lãnh đạo'])) { // Chỉ cho phép truy cập nếu không phải là Lãnh đạo Cục
+        return; // Không mở menu nếu người dùng không có quyền truy cập
+     }
+
+    submenu.classList.toggle('active');
+
+    document.getElementById("funcEquipRecord").addEventListener("click", () => {
+        window.location.href = "/EquipmentRecord";
+    });
+}
+
 function isAbleToAccess(unableRoles) { // unableRoles là mảng chứa các role không được phép truy cập
     // Lấy role của người dùng hiện tại
     const unitId = document.getElementById('role').textContent.trim(); // Giả sử role được hiển thị trong phần tử có id 'role'

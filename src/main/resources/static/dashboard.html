@@ -34,7 +34,14 @@
         <div class="sub-option" id="deleteEquip">Xoá thiết bị</div>
     </div>
 
-    <button class="menu-parent">Hồ sơ trang thiết bị</button>
+    <button class="menu-parent" onclick="toggleEquipRecordMenu()">
+        Hồ sơ trang thiết bị
+    </button>
+        <!--submenu only ONE sub-option -->
+    <div class="submenu" id="equipRecordSubmenu">
+        <div class="sub-option" id="funcEquipRecord">Thêm, Cập nhật, Xóa Hồ sơ trang thiết bị</div>
+    </div>
+        
     <button class="menu-parent">Bảo dưỡng, sửa chữa</button>
 
     <div id="message"></div>
