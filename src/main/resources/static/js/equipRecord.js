@@ -40,6 +40,8 @@ saveBtn.addEventListener('click', async function() {
 });
 
 // III. Functions definitions
+
+// 1. Check login status and populate user info
 async function checkLogin() {
     try {
         const response = await fetch("/api/me", {
@@ -73,6 +75,8 @@ async function checkLogin() {
         }, 1000);
     }
 }
+
+// 2. Handle 'enter' key press on equipIdField to fetch equipment info and records
 
 async function handleEquipIdKeyPress(event) {
     if (event.key === 'Enter') {
@@ -155,6 +159,7 @@ async function handleEquipIdKeyPress(event) {
     }
 }
 
+// 3. Handle save button click to save records
 async function handleSaveButtonClick() {
     const equipId = equipIdField.value.trim();
     if (!equipId) {
@@ -215,6 +220,8 @@ async function handleSaveButtonClick() {
     }
 }
 
+// 4. Function to lock select element (nếu cần thiết)
+
 function lockSelectElement(elementId, valueToLock) {
     const el = document.getElementById(elementId);
     if (!el) return;
@@ -236,3 +243,9 @@ function lockSelectElement(elementId, valueToLock) {
     el.style.backgroundColor = "#e9ecef"; // Màu xám nhạt (giống readonly)
     el.style.cursor = "not-allowed";      // Biểu tượng chuột cấm
 }
+
+// 5. Function to handle "Add" button click to add new record row
+
+// 6. Function to handle "Delete" button click to delete a record row
+
+// 7. Function to handle Update process
