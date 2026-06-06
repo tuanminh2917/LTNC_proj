@@ -1,6 +1,8 @@
 package com.group09.equip_management.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,20 +14,26 @@ public class Plan {
     private Integer planId;
 
     @Column(name = "type", nullable = false)
-    private String type; // Bạn có thể map thành một Enum tương ứng trong Java
+    private String type;
 
     @Column(name = "created_date", nullable = false, updatable = false)
     private java.time.LocalDate createdDate;
 
     @Column(name = "status", nullable = false)
-    private String status; // Bạn có thể map thành một Enum tương ứng trong Java
+    private String status;
 
     @Column(name = "year", nullable = false)
     private Integer year;
 
-    // Kết nối 1 - Nhiều sang bảng chi tiết
-    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PlanDetail> details;
+    // BIẾN PLANDETAIL THÀNH ELEMENT COLLECTION
+    @ElementCollection
+    @CollectionTable(
+        name = "Plan_Detail", // Tên bảng lồng dưới DB
+        joinColumns = @JoinColumn(name = "plan_id") // Khóa ngoại liên kết ngược về bảng Plan
+    )
+    private List<PlanDetail> details = new ArrayList<>();
+
+    // ... các getter/setter khác giữ nguyên ...
 
     // Constructors, Getters, Setters...
 
