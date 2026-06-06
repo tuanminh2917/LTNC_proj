@@ -42,7 +42,15 @@
         <div class="sub-option" id="funcEquipRecord">Thêm, Cập nhật, Xóa Hồ sơ trang thiết bị</div>
     </div>
         
-    <button class="menu-parent">Bảo dưỡng, sửa chữa</button>
+    <button class="menu-parent" onclick="toggleMaintenanceMenu()">
+        Bảo dưỡng, sửa chữa
+    </button>
+
+        <div class="submenu" id="maintenanceSubmenu">
+            <div class="sub-option" id="funcRepairPlan">Kế hoạch sửa chữa</div>
+            <div class="sub-option" id="funcAnnuallyPlan">Kế hoạch bảo dưỡng, thay thế</div>
+            <div class="sub-option" id="funcApprovingPlan">Phê duyệt kế hoạch</div>
+        </div>
 
     <div id="message"></div>
 

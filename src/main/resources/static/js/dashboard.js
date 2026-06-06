@@ -103,6 +103,40 @@ function toggleEquipRecordMenu() {
     });
 }
 
+function toggleMaintenanceMenu() {
+    const submenu = document.getElementById('maintenanceSubmenu');
+    if (!submenu) {
+        console.error("Không tìm thấy submenu với id 'maintenanceSubmenu'");
+        return;
+    }
+
+    submenu.classList.toggle('active');
+
+    document.getElementById("funcRepairPlan").addEventListener("click", () => {
+        // Chặn nếu người dùng có role là 'Lãnh đạo' hoặc 'Đơn vị'
+        if (!isAbleToAccess(['Lãnh đạo', 'Đơn vị'])) {
+            return; // Không cho phép truy cập nếu người dùng không có quyền
+        }
+        window.location.href = "/RepairPlan";
+    });
+
+    document.getElementById("funcAnnuallyPlan").addEventListener("click", () => {
+        // Chặn nếu người dùng có role là 'Lãnh đạo' hoặc 'Đơn vị'
+        if (!isAbleToAccess(['Lãnh đạo', 'Đơn vị'])) {
+            return; // Không cho phép truy cập nếu người dùng không có quyền
+        }
+        window.location.href = "/AnnuallyPlan";
+    });
+
+    document.getElementById("funcApprovingPlan").addEventListener("click", () => {
+        // Chỉ cho phép 'Lãnh đạo' truy cập
+        if (!isAbleToAccess(['Văn phòng', 'Đơn vị'])) {
+            return; // Không cho phép truy cập nếu người dùng không có quyền
+        }
+        window.location.href = "/ApprovingPlan";
+    });
+}
+
 function isAbleToAccess(unableRoles) { // unableRoles là mảng chứa các role không được phép truy cập
     // Lấy role của người dùng hiện tại
     const unitId = document.getElementById('role').textContent.trim(); // Giả sử role được hiển thị trong phần tử có id 'role'

@@ -1,0 +1,210 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #000000;
+    background-color: #ffffff;
+    line-height: 1.5;
+}
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+/* Phần Header phía trên cùng giống mẫu gốc */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 5px;
+    margin-bottom: 25px;
+}
+.header-left {
+    font-size: 14pt;
+    font-weight: bold;
+    font-style: italic;
+}
+.header-right {
+    font-size: 14pt;
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* Mã biểu mẫu ở giữa */
+.form-code {
+    text-align: center;
+    font-size: 14pt;
+    margin-bottom: 30px;
+}
+
+/* Tiêu đề chính và năm */
+.title-block {
+    text-align: center;
+    margin-bottom: 35px;
+}
+h1 {
+    color: #0056b3;
+    font-size: 20pt;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.year-line {
+    font-size: 14pt;
+    font-weight: bold;
+}
+.year-line span {
+    display: inline-block;
+    border-bottom: 1px dotted #000;
+    width: 80px;
+    margin-left: 5px;
+}
+
+/* Cấu trúc bảng */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+th {
+    border: 1.5px solid #0056b3;
+    padding: 12px 6px;
+    color: #0056b3;
+    font-size: 11pt;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #ffffff;
+}
+td {
+    border: 1px solid #d9534f;
+    padding: 15px 8px;
+    text-align: center;
+    font-size: 11pt;
+    vertical-align: middle;
+    background-color: #ffffff;
+}
+
+/* Định dạng độ rộng các cột phù hợp với nội dung chữ */
+.col-stt { width: 6%; }
+.col-name { width: 18%; }
+.col-code { width: 10%; }
+.col-unit { width: 14%; }
+.col-content { width: 14%; }
+.col-executor { width: 16%; }
+.col-time { width: 14%; }
+.col-note { width: 12%; }
+.col-action { width: 10%; }
+
+    /* Các nút phê duyệt và từ chối */
+.approval-buttons {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.approve-btn, .reject-btn {
+    padding: 10px 20px;
+    font-size: 11pt;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.approve-btn {
+    background-color: #28a745;
+    color: #ffffff;
+}
+.reject-btn {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.approve-btn:hover {
+    background-color: #218838;
+}
+
+.reject-btn:hover {
+    background-color: #c82333;
+}
+
+/* Phần tìm kiếm kế hoạch */
+.plan-search {
+    margin-bottom: 30px;
+
+    border: 1px solid #d9534f;
+    padding: 15px;
+}
+
+.plan-search h2 {
+    margin-top: 0;
+    color: black;
+}
+
+.plan-search select, .plan-search button {
+    padding: 8px 12px;
+    font-size: 11pt;
+    margin-right: 10px;
+}
+
+.plan-search input[type="text"] {
+    padding: 8px 12px;
+    font-size: 11pt;
+    width: 150px;
+    margin-right: 10px;
+}
+
+/* Phần danh sách kế hoạch */
+
+.plan-list {
+    border: 1px solid #d9534f;
+    padding: 15px;
+}
+
+.plan-list h2 {
+    color: black;
+}
+
+.plan-toggle {
+    border: 1px solid #d9534f;
+    margin-bottom: 15px;
+}
+
+.plan-toggle-header {
+    background-color: #f8f9fa;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.plan-toggle-header span {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.plan-toggle-content {
+    padding: 10px;
+}
+
+.toggle-btn {
+    padding: 6px 12px;
+    font-size: 11pt;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.toggle-btn:hover {
+    background-color: #0056b3;
+}
+
+#planStatus {
+    font-weight: bold;
+    color: #dc3545; /* Màu đỏ để nổi bật trạng thái */
+}

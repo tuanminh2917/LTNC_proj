@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế Hoạch Bảo Dưỡng, Thay Thế Trang Thiết Bị</title>
+    <link rel="stylesheet" href="css/annually-plan.css">
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+
+    <header>
+        <p id="home-link">Trang chủ</p>
+
+        <div>
+            <p id="user_official_name">Tên người dùng: <span>{{userOfficialName}}</span></p>
+            <p id="user_id">Mã người dùng: <span>{{userId}}</span></p>
+            <p id="user_role">Vai trò: <span>{{userRole}}</span></p>
+        </div>
+    </header>
+    <div class="container">
+
+        <!-- Khối tiêu đề kế hoạch -->
+        <div class="title-block">
+            <h1>KẾ HOẠCH BẢO DƯỠNG, THAY THẾ TRANG THIẾT BỊ</h1>
+            <div class="year-line">Năm: <input type="text" id="yearInput" placeholder="Nhập năm"></div>
+        </div>
+        
+        <!-- Bảng kế hoạch chi tiết -->
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-stt">STT</th>
+                    <th class="col-name">Tên trang thiết bị</th>
+                    <th class="col-id">Mã số</th>
+                    <th class="col-user">Đơn vị sử dụng</th>
+                    <th class="col-content">Nội dung</th>
+                    <th class="col-conductor">Đơn vị thực hiện<br>(nội bộ/ bên ngoài)</th>
+                    <th class="col-time">Thời gian dự kiến (tháng)</th>
+                    <th class="col-note">Ghi chú</th>
+                    <th class="col-action">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-stt">1</td>
+                    <td class="col-name"></td>
+                    <td class="col-id"></td>
+                    <td class="col-user"></td>
+                    <td class="col-content"></td>
+                    <td class="col-conductor"></td>
+                    <td class="col-time"></td>
+                    <td class="col-note"></td>
+                    <td class="col-action">
+                        <button onclick="deleteRow(this)">Xóa</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-stt">2</td>
+                    <td class="col-name"></td>
+                    <td class="col-id"></td>
+                    <td class="col-user"></td>
+                    <td class="col-content"></td>
+                    <td class="col-conductor"></td>
+                    <td class="col-time"></td>
+                    <td class="col-note"></td>
+                    <td class="col-action">
+                        <button onclick="deleteRow(this)">Xóa</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-stt">3</td>
+                    <td class="col-name"></td>
+                    <td class="col-id"></td>
+                    <td class="col-user"></td>
+                    <td class="col-content"></td>
+                    <td class="col-conductor"></td>
+                    <td class="col-time"></td>
+                    <td class="col-note"></td>
+                    <td class="col-action">
+                        <button onclick="deleteRow(this)">Xóa</button>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <div class="button-group">
+            <button class="add-row-btn" onclick="addRow()">Thêm dòng</button>
+            <button class="save-btn" onclick="saveData()">Lưu kế hoạch</button>
+        </div>
+    </div>
+
+    <script src="js/annually-plan.js"></script>
+</body>
+</html>

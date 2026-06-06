@@ -43,6 +43,24 @@ public class WebController {
         return "/dashboard.html";
     }
 
+    // Điều hướng trang kế hoạch bảo dưỡng, thay thế
+    @GetMapping("/AnnuallyPlan")
+    public String getAnnuallyPlanPage() {
+        return "/annually-plan.html";
+    }
+
+    // Điều hướng trang kế hoạch sửa chữa
+    @GetMapping("/RepairPlan")
+    public String getRepairPlanPage() {
+        return "/repair-plan.html";
+    }
+
+    // Điều hướng trang phê duyệt kế hoạch
+    @GetMapping("/ApprovingPlan")
+    public String getApprovingPlanPage() {
+        return "/approving.html";
+    }
+
     // Điều hướng trang chủ (cũng là dashboard)
     @GetMapping("/")
     public String getHomePage() {
