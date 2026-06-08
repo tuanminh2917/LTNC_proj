@@ -115,3 +115,16 @@ td button:hover {
     display: block;
     margin-left: auto;
 }
+.editable-cell {
+    cursor: text;
+    transition: background-color 0.2s ease, outline 0.2s ease;
+}
+
+.editable-cell:hover {
+    background-color: #f0f7ff;
+}
+
+.editable-cell:focus {
+    outline: 2px solid #007bff;
+    background-color: #ffffff;
+}

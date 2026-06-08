@@ -102,7 +102,7 @@ async function handleEquipIdKeyPress(event) {
                     }
                     // Điền dòng thông tin thiết bị vào các trường tương ứng
                     equipNameField.textContent = data.equipName || "Không có tên thiết bị";
-                    receiveDateField.textContent = data.receiveDate || "Không có ngày nhận";
+                    receiveDateField.textContent = data.dateOfReceipt || "Không có ngày nhận";
                 } else {
                     alert("Không tìm thấy thông tin thiết bị với mã số đã nhập.");
                     equipNameField.textContent = "";
@@ -129,14 +129,20 @@ async function handleEquipIdKeyPress(event) {
                         row.appendChild(sttCell);
 
                         const dateCell = document.createElement("td");
+                        dateCell.contentEditable = "true";
+                        dateCell.classList.add("editable-cell");
                         dateCell.textContent = record.conductDay || "";
                         row.appendChild(dateCell);
 
                         const contentCell = document.createElement("td");
+                        contentCell.contentEditable = "true";
+                        contentCell.classList.add("editable-cell");
                         contentCell.textContent = record.scopeOfWork || "";
                         row.appendChild(contentCell);
 
                         const personCell = document.createElement("td");
+                        personCell.contentEditable = "true";
+                        personCell.classList.add("editable-cell");
                         personCell.textContent = record.conductor || "";
                         row.appendChild(personCell);
 
@@ -171,32 +177,41 @@ async function handleSaveButtonClick() {
     const rows = tbody.querySelectorAll("tr");
     const recordsToSave = [];
 
-    rows.forEach((row, index) => {
-        // Ngoại trừ mã bản ghi, kiểm tra xem các ô còn lại có null không. Nếu có, alert và return để dừng quá trình lưu.
+    for (const row of rows) {
         const cells = row.querySelectorAll("td");
-        // Kiểm tra xem các ô còn lại có null không
+
         if (cells.length >= 4) {
-            if (!cells[1].textContent.trim()) {
+            const recDetId = cells[0].textContent.trim();
+            const conductDay = cells[1].textContent.trim();
+            const scopeOfWork = cells[2].textContent.trim();
+            const conductor = cells[3].textContent.trim();
+
+            if (!conductDay) {
                 alert("Ngày thực hiện không được để trống.");
+                cells[1].focus();
                 return;
             }
-            if (!cells[2].textContent.trim()) {
+
+            if (!scopeOfWork) {
                 alert("Nội dung công việc không được để trống.");
+                cells[2].focus();
                 return;
             }
-            if (!cells[3].textContent.trim()) {
+
+            if (!conductor) {
                 alert("Người thực hiện không được để trống.");
+                cells[3].focus();
                 return;
             }
-            const record = {
-                recDetId: cells[0].textContent.trim() || null, // Mã bản ghi, nếu có
-                conductDay: cells[1].textContent.trim(),
-                scopeOfWork: cells[2].textContent.trim(),
-                conductor: cells[3].textContent.trim()
-            };
-            recordsToSave.push(record);
+
+            recordsToSave.push({
+                recDetId: recDetId || null,
+                conductDay: conductDay,
+                scopeOfWork: scopeOfWork,
+                conductor: conductor
+            });
         }
-    });
+    }
 
     try {
         const response = await fetch(`/api/records/save/${equipId}`, {
