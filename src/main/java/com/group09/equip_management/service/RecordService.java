@@ -31,6 +31,25 @@ public class RecordService {
     public List<Record_Detail> getRecordsByConductDay(LocalDate conductDay) {
         return recordRepository.findByConductDay(conductDay);
     }
+    // thêm hồ sơ mới cho một thiết bị
+    @Transactional
+    public boolean addRecordsByEquipId(String equipId, List<Record_Detail> recordList) {
+        if (equipId == null || equipId.trim().isEmpty()) {
+            return false;
+        }
+
+        if (recordList == null || recordList.isEmpty()) {
+            return false;
+        }
+
+        for (Record_Detail record : recordList) {
+            record.setRecDetId(null);
+            record.setEquipId(equipId);
+            recordRepository.save(record);
+        }
+
+        return true;
+    }
 
     // Lưu hoặc cập nhật danh sách Record_Detail cho một thiết bị cụ thể
     @Transactional
