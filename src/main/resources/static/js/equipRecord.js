@@ -143,6 +143,7 @@ async function handleEquipIdKeyPress(event) {
                         const actionCell = document.createElement("td");
                         const deleteButton = document.createElement("button");
                         deleteButton.textContent = "Xóa";
+                        deleteButton.addEventListener('click', () => row.remove());
                         actionCell.appendChild(deleteButton);
                         row.appendChild(actionCell);
 

@@ -10,11 +10,10 @@
 <body>
     <header>
         <p id="home-link">Trang chủ</p>
-
         <div>
-            <p id="user_official_name">Tên người dùng: <span>{{userOfficialName}}</span></p>
-            <p id="user_id">Mã người dùng: <span>{{userId}}</span></p>
-            <p id="user_role">Vai trò: <span>{{userRole}}</span></p>
+            <p id="user_official_name">Tên người dùng: <span></span></p>
+            <p id="user_id">Mã người dùng: <span></span></p>
+            <p id="user_role">Vai trò: <span></span></p>
         </div>
     </header>
 
@@ -23,76 +22,27 @@
 
         <div class="plan-search">
             <h2>Tìm kiếm kế hoạch</h2>
-            <!-- Dropdown chọn loại kế hoạch -->
             <select id="planTypeSelect">
                 <option value="">Chọn loại kế hoạch</option>
-                <option value="annually">Định kỳ</option>
-                <option value="quarterly">Đột xuất</option>
+                <option value="Định kỳ">Định kỳ</option>
+                <option value="Đột xuất">Đột xuất</option>
             </select>
-
-            <!-- Dropdown chọn trạng thái -->
             <select id="planStatusSelect">
                 <option value="">Chọn trạng thái</option>
-                <option value="pending">Chờ phê duyệt</option>
-                <option value="approved">Đã phê duyệt</option>
-                <option value="rejected">Bị từ chối</option>
+                <option value="Chờ phê duyệt">Chờ phê duyệt</option>
+                <option value="Đã phê duyệt">Đã phê duyệt</option>
+                <option value="Bị từ chối">Bị từ chối</option>
             </select>
-
-            <!-- Textbox chọn năm-->
             <input type="text" id="yearInput" placeholder="Nhập năm">
-
             <button id="searchPlanBtn">Tìm kiếm</button>
         </div>
+
         <div class="plan-list">
             <h2>Danh sách kế hoạch</h2>
-            
-            <!-- Hiển thị kế hoạch thành các toggle -->
-            <div class="plan-toggle">
-                <div class="plan-toggle-header">
-                    <span> {Mã kế hoạch}| {Loại kế hoạch: Định kỳ} | {Năm}</span>
-                    <button class="toggle-btn">Hiển thị</button>
-                </div>
-                <div class="plan-toggle-content" style="display: none;">
-                    <!-- Nội dung kế hoạch sẽ được hiển thị ở đây -->
-                    <p>Nội dung kế hoạch định kỳ năm 2024...</p>
-                    <p>Trạng thái: <span id="planStatus">Chờ phê duyệt</span></p>
-                    <!-- Hiển thị kế hoạch dạng bảng -->
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="col-stt">STT</th>
-                                <th class="col-name">Tên trang thiết bị</th>
-                                <th class="col-id">Mã số</th>
-                                <th class="col-user">Đơn vị sử dụng</th>
-                                <th class="col-content">Nội dung</th>
-                                <th class="col-conductor">Đơn vị thực hiện<br>(nội bộ/ bên ngoài)</th>
-                                <th class="col-time">Thời gian dự kiến (tháng)</th>
-                                <th class="col-note">Ghi chú</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="col-stt">1</td>
-                                <td class="col-name">Máy chiếu</td>
-                                <td class="col-id">MC-001</td>
-                                <td class="col-user">Phòng họp A</td>
-                                <td class="col-content">Bảo trì định kỳ</td>
-                                <td class="col-conductor">Nội bộ</td>
-                                <td class="col-time">3 tháng</td>
-                                <td class="col-note"></td>
-                            </tr>
-                            <!-- Thêm các dòng kế hoạch khác ở đây -->
-                        </tbody>
-                    </table>
-                    <div class="approval-buttons">
-                        <button class="approve-btn">Phê duyệt</button>
-                        <button class="reject-btn">Từ chối</button>
-                    </div>
-                </div>
-            </div>
+            <!-- JS sẽ render kế hoạch vào đây -->
         </div>
-
     </div>
-</body>
+
     <script src="js/approving.js"></script>
+</body>
 </html>

@@ -47,4 +47,20 @@ public class PlanController {
         List<Plan> filteredPlans = planService.searchPlans(type, status, year, createdDate, equipId, conductor);
         return new ResponseEntity<>(filteredPlans, HttpStatus.OK);
     }
+    @GetMapping("/approve/{id}")
+    public ResponseEntity<Plan> approvePlan(
+        @PathVariable Integer id) {
+
+    Plan plan = planService.approvePlan(id);
+
+    return ResponseEntity.ok(plan);
+    }
+    @GetMapping("/reject/{id}")
+    public ResponseEntity<Plan> rejectPlan(
+        @PathVariable Integer id) {
+
+    Plan plan = planService.rejectPlan(id);
+
+    return ResponseEntity.ok(plan);
+    }
 }

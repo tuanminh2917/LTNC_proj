@@ -50,4 +50,24 @@ public class PlanService {
         String equipId, String conductor) {
         return planRepository.searchPlans(type, status, year, createdAt, equipId, conductor);
     }
+    public Plan approvePlan(Integer planId) {
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy kế hoạch"));
+    
+        plan.setStatus("Đã phê duyệt");
+    
+        return planRepository.save(plan);
+    }
+    public Plan rejectPlan(Integer planId) {
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy kế hoạch"));
+    
+        plan.setStatus("Bị từ chối");
+    
+        return planRepository.save(plan);
+    }
 }
