@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import com.group09.equip_management.entity.PlanDetail;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/plan")
@@ -46,5 +48,38 @@ public class PlanController {
         // Truyền biến mới vào Service
         List<Plan> filteredPlans = planService.searchPlans(type, status, year, createdDate, equipId, conductor);
         return new ResponseEntity<>(filteredPlans, HttpStatus.OK);
+    }
+
+    @PostMapping("/periodic")
+    public ResponseEntity<?> createPeriodicPlan(@RequestBody Map<String, Object> requestBody) {
+        try {
+            Integer year = Integer.parseInt(requestBody.get("year").toString());
+
+            List<Map<String, Object>> detailMaps =
+                    (List<Map<String, Object>>) requestBody.get("details");
+
+            List<PlanDetail> details = new ArrayList<>();
+
+            for (Map<String, Object> item : detailMaps) {
+                String equipId = item.get("equipId").toString().trim();
+                String conductor = item.get("conductor").toString().trim();
+                Integer expectedTime = Integer.parseInt(item.get("expectedTime").toString());
+                String note = item.get("note") == null ? "" : item.get("note").toString().trim();
+
+                details.add(new PlanDetail(equipId, conductor, expectedTime, note));
+            }
+
+            Plan createdPlan = planService.createPeriodicPlan(year, details);
+            return new ResponseEntity<>(createdPlan, HttpStatus.CREATED);
+
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    Map.of("message", "Không thể tạo kế hoạch bảo dưỡng, thay thế định kỳ"),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

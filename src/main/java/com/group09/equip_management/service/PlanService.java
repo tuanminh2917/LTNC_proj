@@ -5,6 +5,8 @@ import com.group09.equip_management.repository.PlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.group09.equip_management.entity.PlanDetail;
+import java.time.LocalDate;
 
 @Service
 public class PlanService {
@@ -49,5 +51,30 @@ public class PlanService {
         Integer year, java.time.LocalDate createdAt, 
         String equipId, String conductor) {
         return planRepository.searchPlans(type, status, year, createdAt, equipId, conductor);
+    }
+
+    public Plan createPeriodicPlan(Integer year, List<PlanDetail> details) {
+        if (year == null) {
+            throw new IllegalArgumentException("Năm kế hoạch không được để trống");
+        }
+
+        int currentYear = LocalDate.now().getYear();
+
+        if (year < currentYear) {
+            throw new IllegalArgumentException("Năm kế hoạch không được nhỏ hơn năm hiện tại");
+        }
+
+        if (details == null || details.isEmpty()) {
+            throw new IllegalArgumentException("Kế hoạch phải có ít nhất một dòng thiết bị");
+        }
+
+        Plan plan = new Plan();
+        plan.setType("Định kỳ");
+        plan.setStatus("Chờ phê duyệt");
+        plan.setCreatedDate(LocalDate.now());
+        plan.setYear(year);
+        plan.setDetails(details);
+
+        return planRepository.save(plan);
     }
 }
