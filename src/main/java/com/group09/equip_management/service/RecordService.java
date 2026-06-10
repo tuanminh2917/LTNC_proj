@@ -54,39 +54,43 @@ public class RecordService {
     // Lưu hoặc cập nhật danh sách Record_Detail cho một thiết bị cụ thể
     @Transactional
     public boolean saveRecordByEquipId(String equipId, List<Record_Detail> recordList) {
-        // Thêm mới những bản ghi mà rec_dec_id là null (tức là chưa tồn tại trong DB)
-        for (Record_Detail record : recordList) {
-            if (record.getRecDetId() == null) {
-                record.setEquipId(equipId); // Đảm bảo gán equipId cho bản ghi mới
-                recordRepository.save(record);
+        // 1. XÓA TRƯỚC: Lấy toàn bộ dữ liệu đang có dưới DB lên
+        List<Record_Detail> dbRecords = recordRepository.findByEquipId(equipId);
+        
+        for (Record_Detail dbRecord : dbRecords) {
+            // Kiểm tra xem bản ghi dưới DB còn nằm trong danh sách Front-end gửi lên không
+            boolean stillExists = recordList.stream()
+                    .anyMatch(record -> record.getRecDetId() != null && record.getRecDetId().equals(dbRecord.getRecDetId()));
+            
+            // Nếu Front-end đã xóa bỏ nó ra khỏi danh sách -> Xóa dưới DB
+            if (!stillExists) {
+                recordRepository.delete(dbRecord);
             }
         }
 
-        // Cập nhật những bản ghi đã tồn tại (có rec_dec_id khác null)
+        // Cần flush một nhịp để DB thực thi lệnh xóa hoàn toàn trước khi xử lý dữ liệu mới
+        recordRepository.flush(); 
+
+        // 2. CẬP NHẬT & THÊM MỚI
         for (Record_Detail record : recordList) {
-            if (record.getRecDetId() != null) {
+            if (record.getRecDetId() == null) {
+                // Trường hợp THÊM MỚI: Chỉ xử lý khi Id là null
+                record.setEquipId(equipId);
+                recordRepository.save(record);
+            } else {
+                // Trường hợp CẬP NHẬT: Tìm bản ghi gốc để map dữ liệu qua
                 Optional<Record_Detail> existingRecordOpt = recordRepository.findById(record.getRecDetId());
                 if (existingRecordOpt.isPresent()) {
                     Record_Detail existingRecord = existingRecordOpt.get();
                     existingRecord.setConductor(record.getConductor());
                     existingRecord.setScopeOfWork(record.getScopeOfWork());
                     existingRecord.setConductDay(record.getConductDay());
-                    recordRepository.save(existingRecord);
+                    // Không cần gọi .save() nữa vì nhờ @Transactional, 
+                    // Hibernate tự động cập nhật khi đối tượng managed bị thay đổi dữ liệu (Dirty Checking)
                 }
             }
         }
 
-        // Xóa những bản ghi tồn tại trong cơ sở dữ liệu nhưng không có trong danh sách mới (tức là đã bị xóa)
-        List<Record_Detail> existingRecords = recordRepository.findByEquipId(equipId);
-        for (Record_Detail existingRecord : existingRecords) {
-            boolean existsInNewList = recordList.stream()
-                    .anyMatch(record -> record.getRecDetId() != null && record.getRecDetId().equals(existingRecord.getRecDetId()));
-            if (!existsInNewList) {
-                recordRepository.delete(existingRecord);
-            }
-        }
-        
-        // Trả về kết quả thành công sau khi đã xử lý xong tất cả các bản ghi
         return true;
     }
 }

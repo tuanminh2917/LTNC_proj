@@ -13,6 +13,9 @@ public class PlanDetail {
     @Column(name = "conductor")
     private String conductor;
 
+    @Column(name = "scope_of_work", columnDefinition = "TEXT")
+    private String scopeOfWork;
+
     @Column(name = "expected_time")
     private Integer expectedTime;
 
@@ -22,11 +25,12 @@ public class PlanDetail {
     // BẮT BUỘC: Cần có Constructor không tham số cho Hibernate
     public PlanDetail() {}
 
-    public PlanDetail(String equipId, String conductor, Integer expectedTime, String note) {
+    public PlanDetail(String equipId, String conductor, Integer expectedTime, String note, String scopeOfWork) {
         this.equipId = equipId;
         this.conductor = conductor;
         this.expectedTime = expectedTime;
         this.note = note;
+        this.scopeOfWork = scopeOfWork;
     }
 
     // Getters and Setters thông thường...
@@ -38,4 +42,10 @@ public class PlanDetail {
     public void setExpectedTime(Integer expectedTime) { this.expectedTime = expectedTime; }
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+    public String getScopeOfWork() {
+        return scopeOfWork;
+    }
+    public void setScopeOfWork(String scopeOfWork) {
+        this.scopeOfWork = scopeOfWork;
+    }
 }

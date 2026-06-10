@@ -1,4 +1,6 @@
 // I. Initialization
+const homeLink = document.getElementById("home-link");
+
 const statusMap = {
     "pending": "Chờ phê duyệt",
     "approved": "Đã phê duyệt",
@@ -9,10 +11,21 @@ const typeMap = {
     "quarterly": "Đột xuất"
 };
 
+let globalUserMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
+let globalUserMapNameToId = {}; // Dùng cho handleUpdate (Tên -> ID)
+
+let globalUserList = [];
+
 // II. Event listeners and function calls
 checkLogin();
 
+loadUserMapping();
+
 document.getElementById("searchPlanBtn").addEventListener("click", searchPlans);
+
+homeLink.addEventListener("click", () => {
+    window.location.href = "/";
+});
 
 // III. Functions definitions
 
@@ -61,6 +74,7 @@ async function searchPlans() {
         });
 
         const plans = await response.json();
+        console.log(plans);
         displayPlans(plans);
 
     } catch (error) {
@@ -69,8 +83,8 @@ async function searchPlans() {
     }
 }
 
-// 3. Render danh sách kế hoạch
-function displayPlans(plans) {
+// 3. Render danh sách kế hoạch (Đã chuyển thành hàm async)
+async function displayPlans(plans) {
     const container = document.querySelector(".plan-list");
 
     container.querySelectorAll(".plan-toggle, #empty-msg").forEach(el => el.remove());
@@ -83,7 +97,8 @@ function displayPlans(plans) {
         return;
     }
 
-    plans.forEach(plan => {
+    // Dùng vòng lặp for...of để có thể sử dụng await mượt mà bên trong
+    for (const plan of plans) {
         const typeLabel = typeMap[plan.type] || plan.type;
         const statusColor = {
             "Chờ phê duyệt": "orange",
@@ -91,18 +106,49 @@ function displayPlans(plans) {
             "Bị từ chối": "red"
         }[plan.status] || "black";
 
-        const rows = (plan.details || []).map((d, i) => `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${d.equipmentName || ""}</td>
-                <td>${d.equipmentId || ""}</td>
-                <td>${d.usageUnit || ""}</td>
-                <td>${d.content || ""}</td>
-                <td>${d.conductor || ""}</td>
-                <td>${d.estimatedTime || ""}</td>
-                <td>${d.note || ""}</td>
-            </tr>
-        `).join("");
+        // --- XỬ LÝ BẤT ĐỒNG BỘ: Fetch thông tin thiết bị song song cho từng hàng ---
+        const detailPromises = (plan.details || []).map(async (d, i) => {
+            let equipName = "Đang tải...";
+            let userId = -1;
+            
+            if (d.equipId) {
+                try {
+                    const response = await fetch(`/api/equipment/check/${d.equipId}`);
+                    if (response.ok) {
+                        const equipInfo = await response.json();
+                        // Trích xuất tên thiết bị (điều chỉnh key .name hoặc .equipName cho khớp với API của bạn)
+                        equipName = equipInfo.name || equipInfo.equipName || "Không rõ tên";
+                        userId = equipInfo.userId || -1;
+                    } else {
+                        equipName = "Không tìm thấy TB";
+                        userId = -1;
+                    }
+                } catch (error) {
+                    console.error(`Lỗi khi fetch thiết bị ${d.equipId}:`, error);
+                    equipName = "Lỗi tải tên";
+                }
+            } else {
+                equipName = "";
+            }
+
+            return `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${equipName}</td>
+                    <td>${d.equipId || ""}</td>
+                    <td>${globalUserMapIdToName[userId] || ""}</td>
+                    <td>${d.scopeOfWork || ""}</td>
+                    <td>${d.conductor || ""}</td>
+                    <td>${d.expectedTime || ""}</td>
+                    <td>${d.note || ""}</td>
+                </tr>
+            `;
+        });
+
+        // Chờ tất cả các dòng dữ liệu trong kế hoạch này tải xong tên thiết bị
+        const rowsArray = await Promise.all(detailPromises);
+        const rows = rowsArray.join("");
+        // --------------------------------------------------------------------------
 
         const approvalButtons = plan.status === "Chờ phê duyệt" ? `
             <div class="approval-buttons">
@@ -165,7 +211,7 @@ function displayPlans(plans) {
         }
 
         container.appendChild(toggle);
-    });
+    }
 }
 
 // 4. Phê duyệt
@@ -209,3 +255,28 @@ async function rejectPlan(planId, btn) {
         alert("Lỗi khi từ chối kế hoạch");
     }
 }
+
+function loadUserMapping() {
+    // fetch đến route: /api/users/all
+    return fetch('/api/users/all')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể tải danh sách người dùng từ server');
+        return response.json();
+        })
+        .then(users => {
+            // Xử lý dữ liệu người dùng ở đây
+            console.log("Danh sách người dùng:", users);
+            // Đưa dữ liệu vào các biến toàn cục để sử dụng trong các hàm khác
+            globalUserList = users;
+            globalUserMapIdToName = {};
+            globalUserMapNameToId = {};
+            users.forEach(user => {
+                globalUserMapIdToName[user.userId] = user.officialName || user.unit_name;
+                globalUserMapNameToId[user.officialName || user.unit_name] = user.userId;
+            });
+        })
+        .catch(error => {
+            console.error("Lỗi khi tải danh sách người dùng:", error);
+            alert("Không thể tải danh sách người dùng. Vui lòng làm mới trang.");
+        });
+};

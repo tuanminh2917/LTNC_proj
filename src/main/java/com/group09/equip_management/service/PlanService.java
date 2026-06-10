@@ -49,8 +49,8 @@ public class PlanService {
 
     public List<Plan> searchPlans(String type, String status, 
         Integer year, java.time.LocalDate createdAt, 
-        String equipId, String conductor) {
-        return planRepository.searchPlans(type, status, year, createdAt, equipId, conductor);
+        String equipId, String conductor, String scopeOfWork) {
+        return planRepository.searchPlans(type, status, year, createdAt, equipId, conductor, scopeOfWork);
     }
 
     public Plan createPeriodicPlan(Integer year, List<PlanDetail> details) {
@@ -75,6 +75,27 @@ public class PlanService {
         plan.setYear(year);
         plan.setDetails(details);
 
+        return planRepository.save(plan);
+    }
+
+    public Plan approvePlan(Integer planId) {
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy kế hoạch"));
+    
+        plan.setStatus("Đã phê duyệt");
+    
+        return planRepository.save(plan);
+    }
+    public Plan rejectPlan(Integer planId) {
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy kế hoạch"));
+    
+        plan.setStatus("Bị từ chối");
+    
         return planRepository.save(plan);
     }
 }

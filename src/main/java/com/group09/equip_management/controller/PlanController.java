@@ -45,27 +45,31 @@ public class PlanController {
         String equipId = (String) searchParams.get("equipId");
         String conductor = (String) searchParams.get("conductor");
         
+        String scopeOfWork = (String) searchParams.get("scopeOfWork");
+        if (scopeOfWork != null && scopeOfWork.trim().isEmpty()) scopeOfWork = null;
+
         // Truyền biến mới vào Service
-        List<Plan> filteredPlans = planService.searchPlans(type, status, year, createdDate, equipId, conductor);
+        List<Plan> filteredPlans = planService.searchPlans(type, status, year, createdDate, equipId, conductor, scopeOfWork);
         return new ResponseEntity<>(filteredPlans, HttpStatus.OK);
     }
-<<<<<<< HEAD
+    
     @GetMapping("/approve/{id}")
     public ResponseEntity<Plan> approvePlan(
         @PathVariable Integer id) {
 
-    Plan plan = planService.approvePlan(id);
+        Plan plan = planService.approvePlan(id);
 
-    return ResponseEntity.ok(plan);
+        return ResponseEntity.ok(plan);
     }
     @GetMapping("/reject/{id}")
     public ResponseEntity<Plan> rejectPlan(
         @PathVariable Integer id) {
 
-    Plan plan = planService.rejectPlan(id);
+        Plan plan = planService.rejectPlan(id);
 
-    return ResponseEntity.ok(plan);
-=======
+        return ResponseEntity.ok(plan);
+
+    }
 
     @PostMapping("/periodic")
     public ResponseEntity<?> createPeriodicPlan(@RequestBody Map<String, Object> requestBody) {
@@ -82,8 +86,9 @@ public class PlanController {
                 String conductor = item.get("conductor").toString().trim();
                 Integer expectedTime = Integer.parseInt(item.get("expectedTime").toString());
                 String note = item.get("note") == null ? "" : item.get("note").toString().trim();
+                String scopeOfWork = item.get("scopeOfWork").toString();
 
-                details.add(new PlanDetail(equipId, conductor, expectedTime, note));
+                details.add(new PlanDetail(equipId, conductor, expectedTime, note, scopeOfWork));
             }
 
             Plan createdPlan = planService.createPeriodicPlan(year, details);
@@ -98,6 +103,5 @@ public class PlanController {
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
->>>>>>> huy
     }
 }

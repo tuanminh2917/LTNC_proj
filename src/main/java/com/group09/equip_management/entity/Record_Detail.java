@@ -12,7 +12,7 @@ import jakarta.persistence.GenerationType;
 @Table(name = "Record_Detail")
 public class Record_Detail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // <-- BẮT BUỘC PHẢI CÓ DÒNG NÀY
     @Column(name = "rec_det_id")
     private Long recDetId;
 

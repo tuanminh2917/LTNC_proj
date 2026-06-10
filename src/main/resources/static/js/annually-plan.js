@@ -1,4 +1,6 @@
 // I. Variables and Constants
+const homeLink = document.getElementById("home-link");
+
 const addRowBtn = document.querySelector('.add-row-btn');
 const saveBtn = document.querySelector('.save-btn');
 
@@ -15,6 +17,11 @@ loadUserMapping(); // Gọi hàm này khi trang được tải để lấy dữ 
 checkLogin(); // Gọi hàm này khi trang được tải để kiểm tra trạng thái đăng nhập và hiển thị thông tin người dùng
 
 // 2. Event listener để khởi tạo dữ liệu người dùng từ server khi trang được tải
+
+homeLink.addEventListener("click", () => {
+    window.location.href = "/";
+});
+
 // Initialize năm hiện tại vào dòng "Năm ____"
 document.addEventListener('DOMContentLoaded', () => {
     const yearInput = document.querySelector('#yearInput');
@@ -205,7 +212,7 @@ async function saveData() {
         const equipId = row.querySelector('.col-id').innerText.trim();
         const equipName = row.querySelector('.col-name').innerText.trim();
         const unitName = row.querySelector('.col-user').innerText.trim();
-        const content = row.querySelector('.col-content').innerText.trim();
+        const scopeOfWork = row.querySelector('.col-content').innerText.trim();
         const conductor = row.querySelector('.col-conductor').innerText.trim();
         const expectedTimeText = row.querySelector('.col-time').innerText.trim();
         const note = row.querySelector('.col-note').innerText.trim();
@@ -214,7 +221,7 @@ async function saveData() {
             !equipId &&
             !equipName &&
             !unitName &&
-            !content &&
+            !scopeOfWork &&
             !conductor &&
             !expectedTimeText &&
             !note;
@@ -233,7 +240,7 @@ async function saveData() {
             return;
         }
 
-        if (!content) {
+        if (!scopeOfWork) {
             alert("Nội dung không được để trống.");
             return;
         }
@@ -259,7 +266,8 @@ async function saveData() {
             equipId: equipId,
             conductor: conductor,
             expectedTime: expectedTime,
-            note: note ? `${content} - ${note}` : content
+            scopeOfWork: scopeOfWork,
+            note: note ? `${scopeOfWork} - ${note}` : scopeOfWork
         });
     }
 
@@ -267,6 +275,11 @@ async function saveData() {
         alert("Kế hoạch phải có ít nhất một dòng thiết bị hợp lệ.");
         return;
     }
+
+    console.log(JSON.stringify({
+                year: year,
+                details: details
+            }));
 
     try {
         const response = await fetch("/api/plan/periodic", {
