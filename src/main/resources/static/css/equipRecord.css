@@ -115,3 +115,28 @@ td button:hover {
     display: block;
     margin-left: auto;
 }
+
+.new-record-row td {
+    background-color: #f9fff9;
+}
+
+.editable-new-cell {
+    cursor: pointer;
+}
+
+.editable-new-cell:hover {
+    background-color: #eef7ff;
+}
+
+.cell-editor {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #0275d8;
+    padding: 6px;
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+}
+
+textarea.cell-editor {
+    resize: vertical;
+}

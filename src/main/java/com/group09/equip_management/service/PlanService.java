@@ -5,6 +5,8 @@ import com.group09.equip_management.repository.PlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.group09.equip_management.entity.PlanDetail;
+import java.time.LocalDate;
 
 @Service
 public class PlanService {
@@ -50,24 +52,29 @@ public class PlanService {
         String equipId, String conductor) {
         return planRepository.searchPlans(type, status, year, createdAt, equipId, conductor);
     }
-    public Plan approvePlan(Integer planId) {
 
-        Plan plan = planRepository.findById(planId)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy kế hoạch"));
-    
-        plan.setStatus("Đã phê duyệt");
-    
-        return planRepository.save(plan);
-    }
-    public Plan rejectPlan(Integer planId) {
+    public Plan createPeriodicPlan(Integer year, List<PlanDetail> details) {
+        if (year == null) {
+            throw new IllegalArgumentException("Năm kế hoạch không được để trống");
+        }
 
-        Plan plan = planRepository.findById(planId)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy kế hoạch"));
-    
-        plan.setStatus("Bị từ chối");
-    
+        int currentYear = LocalDate.now().getYear();
+
+        if (year < currentYear) {
+            throw new IllegalArgumentException("Năm kế hoạch không được nhỏ hơn năm hiện tại");
+        }
+
+        if (details == null || details.isEmpty()) {
+            throw new IllegalArgumentException("Kế hoạch phải có ít nhất một dòng thiết bị");
+        }
+
+        Plan plan = new Plan();
+        plan.setType("Định kỳ");
+        plan.setStatus("Chờ phê duyệt");
+        plan.setCreatedDate(LocalDate.now());
+        plan.setYear(year);
+        plan.setDetails(details);
+
         return planRepository.save(plan);
     }
 }

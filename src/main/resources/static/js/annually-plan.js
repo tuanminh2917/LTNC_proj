@@ -99,7 +99,6 @@ function addRow() {
     const tableBody = document.querySelector('table tbody');
     const newRow = document.createElement('tr');
 
-    // Tạo các ô mới cho dòng mới
     newRow.innerHTML = `
         <td class="col-stt"></td>
         <td class="col-name"></td>
@@ -113,8 +112,45 @@ function addRow() {
             <button onclick="deleteRow(this)">Xóa</button>
         </td>
     `;
+
     tableBody.appendChild(newRow);
-    updateRowNumbers(); // Cập nhật lại số thứ tự sau khi thêm dòng mới
+    updateRowNumbers();
+
+    const editableCells = newRow.querySelectorAll(
+        'td:not(.col-stt):not(.col-action):not(.col-name):not(.col-user)'
+    );
+
+    editableCells.forEach(cell => {
+        attachDoubleClickEditor(cell);
+    });
+}
+
+function attachDoubleClickEditor(cell) {
+    cell.addEventListener('dblclick', function() {
+        if (this.querySelector('textarea')) return;
+
+        const originalText = this.innerText;
+        const textarea = document.createElement('textarea');
+        textarea.value = originalText;
+
+        this.innerText = '';
+        this.appendChild(textarea);
+        textarea.focus();
+
+        const saveAndClose = () => {
+            const updatedText = textarea.value.trim();
+            this.innerText = updatedText;
+        };
+
+        textarea.addEventListener('blur', saveAndClose);
+
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                textarea.blur();
+            }
+        });
+    });
 }
 
 // Logic xóa dòng khi bấm nút "Xóa"
@@ -134,7 +170,129 @@ function updateRowNumbers() {
 }
 
 // Hàm thu thập dữ liệu từ bảng và gửi về server
-function saveData() {}
+async function saveData() {
+    const yearInput = document.querySelector('#yearInput');
+    const yearText = yearInput.value.trim();
+    const currentYear = new Date().getFullYear();
+
+    if (!yearText) {
+        alert("Năm kế hoạch không được để trống.");
+        return;
+    }
+
+    const year = Number(yearText);
+
+    if (!Number.isInteger(year)) {
+        alert("Năm kế hoạch phải là số nguyên.");
+        return;
+    }
+
+    if (year < currentYear) {
+        alert("Năm kế hoạch không được nhỏ hơn năm hiện tại.");
+        return;
+    }
+
+    const rows = document.querySelectorAll('table tbody tr');
+
+    if (rows.length === 0) {
+        alert("Kế hoạch phải có ít nhất một dòng thiết bị.");
+        return;
+    }
+
+    const details = [];
+
+    for (const row of rows) {
+        const equipId = row.querySelector('.col-id').innerText.trim();
+        const equipName = row.querySelector('.col-name').innerText.trim();
+        const unitName = row.querySelector('.col-user').innerText.trim();
+        const content = row.querySelector('.col-content').innerText.trim();
+        const conductor = row.querySelector('.col-conductor').innerText.trim();
+        const expectedTimeText = row.querySelector('.col-time').innerText.trim();
+        const note = row.querySelector('.col-note').innerText.trim();
+
+        const isEmptyRow =
+            !equipId &&
+            !equipName &&
+            !unitName &&
+            !content &&
+            !conductor &&
+            !expectedTimeText &&
+            !note;
+
+        if (isEmptyRow) {
+            continue;
+        }
+
+        if (!equipId) {
+            alert("Mã số thiết bị không được để trống.");
+            return;
+        }
+
+        if (!equipName || !unitName) {
+            alert(`Thiết bị ${equipId} chưa được hệ thống xác nhận.`);
+            return;
+        }
+
+        if (!content) {
+            alert("Nội dung không được để trống.");
+            return;
+        }
+
+        if (!conductor) {
+            alert("Đơn vị thực hiện không được để trống.");
+            return;
+        }
+
+        if (!expectedTimeText) {
+            alert("Thời gian dự kiến không được để trống.");
+            return;
+        }
+
+        const expectedTime = Number(expectedTimeText);
+
+        if (!Number.isInteger(expectedTime) || expectedTime < 1 || expectedTime > 12) {
+            alert("Thời gian dự kiến phải là số nguyên từ 1 đến 12.");
+            return;
+        }
+
+        details.push({
+            equipId: equipId,
+            conductor: conductor,
+            expectedTime: expectedTime,
+            note: note ? `${content} - ${note}` : content
+        });
+    }
+
+    if (details.length === 0) {
+        alert("Kế hoạch phải có ít nhất một dòng thiết bị hợp lệ.");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/plan/periodic", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                year: year,
+                details: details
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Kế hoạch bảo dưỡng, thay thế định kỳ đã được tạo thành công.");
+        } else {
+            alert(data.message || "Không thể tạo kế hoạch. Vui lòng thử lại sau.");
+        }
+
+    } catch (error) {
+        console.error("Lỗi khi lưu kế hoạch:", error);
+        alert("Đã xảy ra lỗi khi lưu kế hoạch.");
+    }
+}
 
 function loadUserMapping() {
     // fetch đến route: /api/users/all

@@ -44,6 +44,12 @@ public class RecordController {
         return new ResponseEntity<>(records, HttpStatus.OK);
     }
 
+    @PostMapping("/add/{equipId}")
+    public ResponseEntity<Boolean> addRecords(@PathVariable String equipId, @RequestBody List<Record_Detail> recordList) {
+        boolean isAdded = recordService.addRecordsByEquipId(equipId, recordList);
+        return new ResponseEntity<>(isAdded, HttpStatus.CREATED);
+    }
+
     @PostMapping("/save/{equipId}")
     public ResponseEntity<Boolean> saveRecord(@PathVariable String equipId, @RequestBody List<Record_Detail> recordList) {
         boolean isSaved = recordService.saveRecordByEquipId(equipId, recordList);
