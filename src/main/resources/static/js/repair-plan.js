@@ -133,8 +133,146 @@ function updateRowNumbers() {
     });
 }
 
+let isSavingPlan = false;
+
 // Hàm thu thập dữ liệu từ bảng và gửi về server
-function saveData() {}
+async function saveData() {
+    if (isSavingPlan) {
+        return;
+    }
+
+    isSavingPlan = true;
+
+    const saveButton = document.querySelector('button[onclick="saveData()"]');
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.textContent = "Đang lưu...";
+    }
+
+    try {
+        const yearInput = document.querySelector('#yearInput');
+        const year = yearInput.value.trim();
+
+        if (!year) {
+            alert("Vui lòng nhập năm kế hoạch.");
+            yearInput.focus();
+            return;
+        }
+
+        if (isNaN(year) || Number(year) < new Date().getFullYear()) {
+            alert("Năm kế hoạch không hợp lệ.");
+            yearInput.focus();
+            return;
+        }
+
+        const rows = document.querySelectorAll('table tbody tr');
+        const details = [];
+
+        for (const row of rows) {
+            const equipIdCell = row.querySelector('.col-id');
+            const contentCell = row.querySelector('.col-content');
+            const conductorCell = row.querySelector('.col-conductor');
+            const timeCell = row.querySelector('.col-time');
+            const noteCell = row.querySelector('.col-note');
+
+            const equipId = equipIdCell.innerText.trim();
+            const scopeOfWork = contentCell.innerText.trim();
+            const conductor = conductorCell.innerText.trim();
+            const expectedTimeText = timeCell.innerText.trim();
+            const note = noteCell.innerText.trim();
+
+            const isEmptyRow =
+                !equipId &&
+                !scopeOfWork &&
+                !conductor &&
+                !expectedTimeText &&
+                !note;
+
+            if (isEmptyRow) {
+                continue;
+            }
+
+            if (!equipId) {
+                alert("Mã số thiết bị không được để trống.");
+                equipIdCell.focus();
+                return;
+            }
+
+            if (!scopeOfWork) {
+                alert("Nội dung sửa chữa không được để trống.");
+                contentCell.focus();
+                return;
+            }
+
+            if (!conductor) {
+                alert("Đơn vị thực hiện không được để trống.");
+                conductorCell.focus();
+                return;
+            }
+
+            if (!expectedTimeText) {
+                alert("Thời gian dự kiến không được để trống.");
+                timeCell.focus();
+                return;
+            }
+
+            const expectedTime = Number(expectedTimeText);
+
+            if (!Number.isInteger(expectedTime) || expectedTime < 1 || expectedTime > 12) {
+                alert("Thời gian dự kiến phải là số nguyên từ 1 đến 12.");
+                timeCell.focus();
+                return;
+            }
+
+            details.push({
+                equipId: equipId,
+                scopeOfWork: scopeOfWork,
+                conductor: conductor,
+                expectedTime: expectedTime,
+                note: note
+            });
+        }
+
+        if (details.length === 0) {
+            alert("Kế hoạch phải có ít nhất một dòng thiết bị.");
+            return;
+        }
+
+        const requestBody = {
+            year: Number(year),
+            details: details
+        };
+
+        const response = await fetch('/api/plan/unexpected-repair', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || "Không thể lưu kế hoạch sửa chữa đột xuất.");
+            return;
+        }
+
+        alert("Tạo kế hoạch sửa chữa đột xuất thành công.");
+
+    } catch (error) {
+        console.error("Lỗi khi lưu kế hoạch:", error);
+        alert("Có lỗi xảy ra khi lưu kế hoạch. Vui lòng thử lại.");
+
+    } finally {
+        isSavingPlan = false;
+
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = "Lưu kế hoạch";
+        }
+    }
+}
 
 function loadUserMapping() {
     // fetch đến route: /api/users/all

@@ -78,6 +78,31 @@ public class PlanService {
         return planRepository.save(plan);
     }
 
+    public Plan createUnexpectedRepairPlan(Integer year, List<PlanDetail> details) {
+        if (year == null) {
+            throw new IllegalArgumentException("Năm kế hoạch không được để trống");
+        }
+
+        int currentYear = LocalDate.now().getYear();
+
+        if (year < currentYear) {
+            throw new IllegalArgumentException("Năm kế hoạch không được nhỏ hơn năm hiện tại");
+        }
+
+        if (details == null || details.isEmpty()) {
+            throw new IllegalArgumentException("Kế hoạch phải có ít nhất một dòng thiết bị");
+        }
+
+        Plan plan = new Plan();
+        plan.setType("Đột xuất");
+        plan.setStatus("Chờ phê duyệt");
+        plan.setCreatedDate(LocalDate.now());
+        plan.setYear(year);
+        plan.setDetails(details);
+
+        return planRepository.save(plan);
+    }
+
     public Plan approvePlan(Integer planId) {
 
         Plan plan = planRepository.findById(planId)
