@@ -49,4 +49,6 @@ public interface PlanRepository extends JpaRepository<Plan, Integer> {
 
     // Find plans by type
     List<Plan> findByType(@Param("type") String type);
+
+    boolean existsByTypeAndStatusAndYear(String type, String status, Integer year);
 }

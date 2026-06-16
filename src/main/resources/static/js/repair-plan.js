@@ -1,4 +1,6 @@
 // I. Variables and Constants
+const homeLink = document.getElementById("home-link");
+
 const addRowBtn = document.querySelector('.add-row-btn');
 const saveBtn = document.querySelector('.save-btn');
 
@@ -15,6 +17,10 @@ loadUserMapping(); // Gọi hàm này khi trang được tải để lấy dữ 
 checkLogin(); // Gọi hàm này khi trang được tải để kiểm tra trạng thái đăng nhập và hiển thị thông tin người dùng
 
 // 2. Event listener để khởi tạo dữ liệu người dùng từ server khi trang được tải
+homeLink.addEventListener("click", () => {
+    window.location.href = "/";
+});
+
 // Initialize năm hiện tại vào dòng "Năm ____"
 document.addEventListener('DOMContentLoaded', () => {
     const yearInput = document.querySelector('#yearInput');
@@ -115,6 +121,42 @@ function addRow() {
     `;
     tableBody.appendChild(newRow);
     updateRowNumbers(); // Cập nhật lại số thứ tự sau khi thêm dòng mới
+
+    const editableCells = newRow.querySelectorAll(
+        'td:not(.col-stt):not(.col-action):not(.col-name):not(.col-user)'
+    );
+
+    editableCells.forEach(cell => {
+        attachDoubleClickEditor(cell);
+    });
+}
+
+function attachDoubleClickEditor(cell) {
+    cell.addEventListener('dblclick', function() {
+        if (this.querySelector('textarea')) return;
+
+        const originalText = this.innerText;
+        const textarea = document.createElement('textarea');
+        textarea.value = originalText;
+
+        this.innerText = '';
+        this.appendChild(textarea);
+        textarea.focus();
+
+        const saveAndClose = () => {
+            const updatedText = textarea.value.trim();
+            this.innerText = updatedText;
+        };
+
+        textarea.addEventListener('blur', saveAndClose);
+
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                textarea.blur();
+            }
+        });
+    });
 }
 
 // Logic xóa dòng khi bấm nút "Xóa"

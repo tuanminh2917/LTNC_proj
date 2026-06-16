@@ -2,6 +2,9 @@ package com.group09.equip_management.service;
 
 import com.group09.equip_management.entity.Plan;
 import com.group09.equip_management.repository.PlanRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -53,7 +56,22 @@ public class PlanService {
         return planRepository.searchPlans(type, status, year, createdAt, equipId, conductor, scopeOfWork);
     }
 
+    @Transactional
     public Plan createPeriodicPlan(Integer year, List<PlanDetail> details) {
+        // 1. KIỂM TRA NGHIỆP VỤ: Tìm xem dưới DB đã có kế hoạch "Bảo dưỡng, thay thế" nào "Đã phê duyệt" cho năm này chưa
+        // Bạn có thể viết thêm hàm này trong PlanRepository
+        boolean isAlreadyApproved = planRepository.existsByTypeAndStatusAndYear(
+                "Bảo dưỡng, thay thế", 
+                "Đã phê duyệt", 
+                year
+        );
+
+        // 2. CHẶN ĐỨNG: Nếu đã có rồi, không cho phép tạo nữa!
+        if (isAlreadyApproved) {
+            throw new IllegalArgumentException("Không thể thêm kế hoạch! Năm " + year + " đã tồn tại một kế hoạch Bảo dưỡng, thay thế đã được phê duyệt.");
+        }
+
+
         if (year == null) {
             throw new IllegalArgumentException("Năm kế hoạch không được để trống");
         }
@@ -69,7 +87,7 @@ public class PlanService {
         }
 
         Plan plan = new Plan();
-        plan.setType("Định kỳ");
+        plan.setType("Bảo dưỡng, thay thế");
         plan.setStatus("Chờ phê duyệt");
         plan.setCreatedDate(LocalDate.now());
         plan.setYear(year);
@@ -94,7 +112,7 @@ public class PlanService {
         }
 
         Plan plan = new Plan();
-        plan.setType("Đột xuất");
+        plan.setType("Sửa chữa");
         plan.setStatus("Chờ phê duyệt");
         plan.setCreatedDate(LocalDate.now());
         plan.setYear(year);

@@ -7,8 +7,8 @@ const statusMap = {
     "rejected": "Bị từ chối"
 };
 const typeMap = {
-    "annually": "Định kỳ",
-    "quarterly": "Đột xuất"
+    "annually": "Bảo dưỡng, thay thế",
+    "quarterly": "Sửa chữa"
 };
 
 let globalUserMapIdToName = {}; // Dùng cho renderSearchResults (ID -> Tên)
@@ -220,6 +220,13 @@ async function approvePlan(planId, btn) {
 
     try {
         const response = await fetch(`/api/plan/approve/${planId}`, { method: "GET" });
+
+        // HÀNG RÀO KIỂM SOÁT: Nếu Server trả về 400, 500... response.ok sẽ bằng false
+        if (!response.ok) {
+            // Chủ động ném lỗi để nhảy thẳng xuống block catch bên dưới
+            throw new Error(`Server gặp lỗi với mã: ${response.status}`);
+        }
+
         const updated = await response.json();
 
         alert("Phê duyệt thành công!");
@@ -231,7 +238,7 @@ async function approvePlan(planId, btn) {
 
     } catch (error) {
         console.error("Approve error:", error);
-        alert("Lỗi khi phê duyệt kế hoạch");
+        alert("Lỗi khi phê duyệt kế hoạch.\nCó thể có một Kế hoạch bảo dưỡng, thay thế khác cùng năm đã được Phê duyệt rồi!\nHãy kiểm tra lại");
     }
 }
 
