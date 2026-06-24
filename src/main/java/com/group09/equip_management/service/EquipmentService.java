@@ -84,6 +84,13 @@ public class EquipmentService {
         return equipmentRepository.save(equipment);
     }
 
+    @Transactional // RẤT QUAN TRỌNG: Đảm bảo All-or-Nothing
+    public List<Equipment> addMultipleEquipments(List<Equipment> equipments) {
+        // Tuỳ vào logic, bạn có thể loop để lưu từng cái hoặc dùng saveAll()
+        // equipmentRepository.saveAll(equipments) là cách tối ưu nhất của Spring Data JPA
+        return equipmentRepository.saveAll(equipments);
+    }
+
     @Transactional
     public void deleteEquipment(String equipId) {
 

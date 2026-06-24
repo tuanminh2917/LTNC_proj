@@ -21,6 +21,7 @@ checkLogin();
 
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('addBtn').addEventListener('click', handleAddEquipment);
+    document.getElementById('addBatch').addEventListener('click', handleImportEquipmentExcel);
     document.getElementById('resetBtn').addEventListener('click', clearForm);
     document.getElementById('reloadBtn').addEventListener('click', loadEquipmentList);
 
@@ -92,10 +93,14 @@ async function checkLogin() {
         const loggedInUserId = data.user.userId || data.user.unit_id;
         const loggedInUserRole = data.user.role || data.user.unit_role;
 
+        console.log(loggedInUserId);
+
         if (loggedInUserRole !== "Lãnh đạo" && loggedInUserRole !== "Văn phòng") {
             // Khóa select ở giá trị của đơn vị đang đăng nhập
             lockSelectElement('userOfficialName', loggedInUserId);
         }
+
+        console.log(document.getElementById('userOfficialName').value);
 
     } catch (error) {
         console.error("Check login error:", error);
@@ -224,6 +229,161 @@ async function handleAddEquipment() {
     } catch (error) {
         console.error('Lỗi thêm thiết bị:', error);
         alert(error.message || 'Có lỗi xảy ra khi thêm thiết bị.');
+    }
+}
+
+async function handleImportEquipmentExcel() {
+    // Giả định bạn có một thẻ <input type="file" id="excelFileInput" accept=".xlsx, .xls"> trong HTML
+    const fileInput = document.getElementById('excelFileInput'); 
+    const file = fileInput ? fileInput.files[0] : null;
+
+    if (!file) {
+        alert('Vui lòng chọn file Excel trước khi thực hiện nhập dữ liệu.');
+        return;
+    }
+
+    // Hàm bổ trợ đọc file Excel bằng FileReader dưới dạng Promise để dùng được async/await
+    const readExcel = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (err) => reject(err);
+        });
+    };
+
+    try {
+        const arrayBuffer = await readExcel(file);
+        const data = new Uint8Array(arrayBuffer);
+        
+        // Đọc dữ liệu từ file, sử dụng cellDates: true để SheetJS tự chuyển đổi cột ngày tháng sang Object Date
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        // Chuyển đổi sheet thành mảng các Object JSON dựa trên dòng tiêu đề (Header)
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (jsonData.length === 0) {
+            alert('File Excel không có dữ liệu hoặc sai định dạng cấu trúc hàng.');
+            return;
+        }
+
+        // --- 1. CHUẨN BỊ MAP CHUYỂN ĐỔI TÊN ĐƠN VỊ SANG ID (KHÔNG PHÂN BIỆT HOA THƯỜNG) ---
+        const lowerCaseUserMap = {};
+        if (typeof globalUserMapNameToId === 'object') {
+            for (const key in globalUserMapNameToId) {
+                // Chuyển hết key (tên đơn vị) về chữ thường để so sánh không phân biệt hoa thường
+                lowerCaseUserMap[key.toLowerCase().trim()] = globalUserMapNameToId[key];
+            }
+        }
+
+        // --- 2. LẤY THÔNG TIN VAI TRÒ HIỆN TẠI (ROLE) TỪ DOM ---
+        const userRoleElement = document.getElementById('user_role');
+        const userRoleSpan = userRoleElement ? userRoleElement.querySelector("span") : null;
+        const currentRoleText = userRoleSpan ? userRoleSpan.textContent.trim() : "";
+        const isVanPhong = currentRoleText === "Văn phòng";
+
+        const validEquipments = []; // Mảng chứa danh sách thiết bị hợp lệ sẵn sàng gửi lên API
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // --- 3. TIẾN HÀNH KIỂM TRA (VALIDATE) TOÀN BỘ CÁC HÀNG TRONG FILE EXCEL ---
+        for (let i = 0; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            const rowNum = i + 2; // Số dòng thực tế trong file Excel (Tiêu đề là dòng 1, data tính từ dòng 2)
+
+            // Lấy dữ liệu theo đúng tên 5 cột yêu cầu
+            const equipId = row["Mã thiết bị"]?.toString().trim();
+            const equipName = row["Tên thiết bị"]?.toString().trim();
+            const origin = row["Nước sản xuất"]?.toString().trim();
+            const dateOfReceiptRaw = row["Ngày tiếp nhận"];
+            const unitName = row["Đơn vị"]?.toString().trim();
+
+            // Ràng buộc: Tất cả các ô không được để trống
+            if (!equipId || !equipName || !origin || !dateOfReceiptRaw || !unitName) {
+                alert(`Dòng ${rowNum}: Vui lòng điền đầy đủ thông tin (Mã TB, Tên TB, Nước sản xuất, Ngày tiếp nhận, Đơn vị).`);
+                return; // Ngừng toàn bộ tiến trình nếu có 1 hàng vi phạm
+            }
+
+            // Ràng buộc: Kiểm tra vai trò quản lý đơn vị
+            if (!isVanPhong && unitName.toLowerCase() !== currentRoleText.toLowerCase()) {
+                alert(`Dòng ${rowNum}: Đơn vị "${unitName}" không khớp với vai trò của bạn ("${currentRoleText}"). Bạn không có quyền thêm thiết bị cho đơn vị khác`);
+                return; 
+            }
+
+            // Ràng buộc: Ánh xạ tên đơn vị sang mã đơn vị (ID) không phân biệt hoa thường
+            const mappedUserId = lowerCaseUserMap[unitName.toLowerCase()];
+            if (!mappedUserId) {
+                alert(`Dòng ${rowNum}: Không tìm thấy mã đơn vị phù hợp cho tên: "${unitName}". Vui lòng kiểm tra lại chính tả.`);
+                return;
+            }
+
+            // Ràng buộc: Kiểm tra định dạng ngày tiếp nhận và ngày trong tương lai
+            let inputDate;
+            if (dateOfReceiptRaw instanceof Date) {
+                inputDate = new Date(dateOfReceiptRaw);
+            } else {
+                inputDate = new Date(dateOfReceiptRaw); // Fallback nếu dữ liệu là dạng chuỗi string
+            }
+
+            if (isNaN(inputDate.getTime())) {
+                alert(`Dòng ${rowNum}: Ngày tiếp nhận không đúng định dạng ngày tháng.`);
+                return;
+            }
+
+            inputDate.setHours(0, 0, 0, 0);
+            if (inputDate > today) {
+                alert(`Dòng ${rowNum}: Ngày tiếp nhận không thể là ngày trong tương lai.`);
+                return;
+            }
+
+            // Chuẩn hóa ngày về dạng chuỗi YYYY-MM-DD để gửi lên API cho đồng bộ dữ liệu cũ
+            const year = inputDate.getFullYear();
+            const month = String(inputDate.getMonth() + 1).padStart(2, '0');
+            const day = String(inputDate.getDate()).padStart(2, '0');
+            const dateOfReceiptStr = `${year}-${month}-${day}`;
+
+            // Đưa dữ liệu đã sạch (Clean Data) vào hàng đợi chuẩn bị gửi
+            validEquipments.push({
+                equipId: equipId,
+                equipName: equipName,
+                origin: origin,
+                dateOfReceipt: dateOfReceiptStr,
+                userId: parseInt(mappedUserId)
+            });
+        }
+
+        // --- 4. GỌI ENDPOINT API ĐỂ THÊM VÀO CƠ SỞ DỮ LIỆU ---
+        // Đoạn này chỉ chạy khi toàn bộ các hàng phía trên đã vượt qua bộ lọc validate thành công
+        try {
+            const response = await fetch('/api/equipment/add-batch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(validEquipments) // Gửi thẳng mảng dữ liệu lên
+            });
+
+            if (!response.ok) {
+                const message = await response.text();
+                throw new Error(message);
+            }
+
+            alert(`Nhập dữ liệu thành công! Đã thêm tổng cộng ${validEquipments.length} thiết bị từ file Excel.`);
+            
+            if (fileInput) fileInput.value = '';
+            if (typeof loadEquipmentList === 'function') {
+                loadEquipmentList();
+            }
+        } catch (error) {
+            console.error('Lỗi khi lưu danh sách vào DB:', error);
+            alert(`Có lỗi xảy ra khi lưu vào hệ thống: ${error.message}`);
+        }
+
+    } catch (error) {
+        console.error('Lỗi quá trình import Excel:', error);
+        alert(error.message || 'Có lỗi xảy ra trong quá trình xử lý file Excel.');
     }
 }
 

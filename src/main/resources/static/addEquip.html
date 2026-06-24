@@ -66,6 +66,12 @@
                 <button class="btn btn-secondary" id="resetBtn">Làm mới</button>
             </div>
 
+            <div class="excel-import-container">
+                <label>Thêm từ file Excel</label>
+                <input type="file" id="excelFileInput" accept=".xlsx, .xls" />
+                <button class="btn btn-primary" id="addBatch">Thêm</button>
+            </div>
+
             <p class="note">
                 Sau khi thêm thành công, danh sách thiết bị bên phải sẽ tự động cập nhật.
             </p>
@@ -83,7 +89,7 @@
                         <th>Mã thiết bị</th>
                         <th>Tên thiết bị</th>
                         <th>Nước sản xuất</th>
-                        <th>Ngày tiếp nhận</th>
+                        <th>Ngày tiếp nhận <br>(yyyy-mm-dd)</th>
                         <th>Đơn vị</th>
                     </tr>
                 </thead>
@@ -98,5 +104,6 @@
 </div>
 
 <script src="/js/addEquip.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </body>
 </html>

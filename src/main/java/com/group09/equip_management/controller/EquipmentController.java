@@ -56,6 +56,17 @@ public class EquipmentController {
         }
     }
 
+    @PostMapping("/add-batch")
+    public ResponseEntity<?> addMultipleEquipments(@RequestBody List<Equipment> equipments) {
+        try {
+            // Gọi service để lưu toàn bộ danh sách
+            List<Equipment> savedEquipments = equipmentService.addMultipleEquipments(equipments);
+            return ResponseEntity.ok(savedEquipments);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Lỗi khi thêm danh sách thiết bị: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<Equipment>> getAllEquipment() {
         return ResponseEntity.ok(equipmentService.getAllEquipment());
